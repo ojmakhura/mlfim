@@ -20,6 +20,7 @@ using namespace clustering;
 using namespace clustering::distance;
 namespace clustering {
 
+
 string getWarningMessage() {
 	string message =
 			"----------------------------------------------- WARNING -----------------------------------------------\n";
@@ -40,24 +41,28 @@ string getWarningMessage() {
 	return message;
 }
 
-hdbscan::hdbscan(){
+template <class T1>
+hdbscan<T1>::hdbscan(){
 	this->minPoints = 0;
 	this->minClusterSize = 0;
+	distanceFunction.setCalculator(_EUCLIDEAN);
 	distanceFunction.setCalculator(_EUCLIDEAN);
 	selfEdges = true;
 	//mst = NULL;
 	numPoints = 0;
 }
 
-
-hdbscan::hdbscan(calculator cal, uint minPoints, uint minClusterSize) {
+template <class T1>
+hdbscan<T1>::hdbscan(calculator cal, uint minPoints, uint minClusterSize) {
 	this->minPoints = minPoints;
 	this->minClusterSize = minClusterSize;
 	distanceFunction.setCalculator(cal);
 	selfEdges = true;
 	numPoints = 0;
 }
-hdbscan::hdbscan(float* dataSet, int rows, int cols, calculator cal,
+
+/*template <class T1>
+hdbscan<T1>::hdbscan(T1* dataSet, int rows, int cols, calculator cal,
 		uint minPoints, uint minClusterSize) {
 
 	this->minClusterSize = minClusterSize;
@@ -66,18 +71,20 @@ hdbscan::hdbscan(float* dataSet, int rows, int cols, calculator cal,
 	selfEdges = true;
 	calculateCoreDistances(dataSet, rows, cols);
 	numPoints = rows;
-}
+}*/
 
-hdbscan::hdbscan(Mat& dataset, calculator cal, uint minPoints, uint minClusterSize){
+/*template <class T1>
+hdbscan<T1>::hdbscan(Mat& dataset, calculator cal, uint minPoints, uint minClusterSize){
 	this->minClusterSize = minClusterSize;
 	this->minPoints = minPoints;
 	distanceFunction.setCalculator(cal);
 	selfEdges = true;
 	numPoints = dataset.rows;
 	distanceFunction.cvComputeDistance(dataset, minPoints-1);
-}
+}*/
 
-hdbscan::~hdbscan() {
+template <class T1>
+hdbscan<T1>::~hdbscan() {
 
 
 	for (uint i = 0; i < constraints.size(); ++i) {
@@ -103,7 +110,8 @@ hdbscan::~hdbscan() {
  * @return A vector<float>[] where index [i][j] indicates the jth attribute of data point i
  * @throws IOException If any errors occur opening or reading from the file
  */
-float* hdbscan::readInDataSet(string fileName, int* rows, int* cols) {
+template <class T1>
+float* hdbscan<T1>::readInDataSet(string fileName, int* rows, int* cols) {
 
 	float* dataSet;
 	//dataSet = imread(fileName);
@@ -177,7 +185,8 @@ float* hdbscan::readInDataSet(string fileName, int* rows, int* cols) {
  * @return An vector of Constraints
  * @throws IOException If any errors occur opening or reading from the file
  */
-void hdbscan::readInConstraints(string fileName) {
+template <class T1>
+void hdbscan<T1>::readInConstraints(string fileName) {
 
 	std::ifstream inFile(fileName);
 	string item;
@@ -207,7 +216,8 @@ void hdbscan::readInConstraints(string fileName) {
  * @param distanceFunction A DistanceCalculator to compute distances between points
  * @return An array of core distances
  */
-void hdbscan::calculateCoreDistances(float* dataSet, int rows, int cols) {
+template <class T1>
+void hdbscan<T1>::calculateCoreDistances(T1* dataSet, int rows, int cols) {
 
 	uint size = rows;
 
@@ -221,141 +231,23 @@ void hdbscan::calculateCoreDistances(float* dataSet, int rows, int cols) {
 
 }
 
-void hdbscan::cvCalculateCoreDistances(vector<Mat> dataset, bool indexed) {
+/*template <class T1>
+void hdbscan<T1>::cvCalculateCoreDistances(vector<Mat> dataset, bool indexed) {
 
-	/*uint size = rows;
+	uint size = rows;
 
 
 
 	if (minPoints == 1 && size < minPoints) {
 		return;
-	}*/
+	}
 	int numNeighbors = minPoints - 1;
 	distanceFunction.cvComputeDistance(dataset, numNeighbors, indexed);
 
-}
-
-/**
- * Constructs the minimum spanning tree of mutual reachability distances for the data set, given
- * the core distances for each point.
- * @param dataSet A vector<vector<float> > where index [i][j] indicates the jth attribute of data point i
- * @param coreDistances An array of core distances for each data point
- * @param selfEdges If each point should have an edge to itself with weight equal to core distance
- * @param distanceFunction A DistanceCalculator to compute distances between points
- */
-
-/*void hdbscan::constructMST(Mat& src) {
-
-	//int nb_edges = 0;
-	Mat dataset = src.clone();
-	numPoints = dataset.rows * dataset.cols;
-	clusterLabels.resize(numPoints, 0);
-	int nb_channels = dataset.channels();
-
-	int selfEdgeCapacity = 0;
-	uint size = dataset.rows * dataset.cols;
-	if (selfEdges) {
-		//printf("Self edges set to true\n");
-		selfEdgeCapacity = size;
-	}
-
-	//One bit is set (true) for each attached point, or unset (false) for unattached points:
-	//bool attachedPoints[selfEdgeCapacity] = { };
-	//The MST is expanded starting with the last point in the data set:
-	//unsigned int currentPoint = size - 1;
-	//int numAttachedPoints = 1;
-	//attachedPoints[size - 1] = true;
-
-	//Each point has a current neighbor point in the tree, and a current nearest distance:
-	vector<int>* nearestMRDNeighbors = new vector<int>(size - 1 + selfEdgeCapacity);
-	vector<float>* weights = new vector<float>(size - 1 + selfEdgeCapacity, numeric_limits<float>::max());
-
-	//Create an array for vertices in the tree that each point attached to:
-	vector<int>* otherVertexIndices = new vector<int>(size - 1 + selfEdgeCapacity);
-
-	for (int i = 0; i < dataset.rows; i++) {
-		const float* p = dataset.ptr<float>(i);
-
-		for (int j = 0; j < dataset.cols; j++) {
-
-			//Mat ds(Size(3,3), CV_32FC1, numeric_limits<float>::max());
-			//vector<float> dsv(9, numeric_limits<float>::max());
-
-			int from = i * dataset.rows + j;
-			int to;
-			int r = 0, c = 0;
-			float min_d = numeric_limits<float>::max();
-			float coreDistance = 0;
-			min_d = numeric_limits<float>::max();
-
-			for(int k = -1; k <= 1; ++k){
-				for(int l = -1; l <= 1; ++l){
-
-					float distance = 0;
-					r = i+k;
-					c = j+l;
-					const float* p2 = dataset.ptr<float>(r);
-
-					if(r >= 0 && c >= 0 && r < dataset.rows && c < dataset.cols && !(r == i && c == j)){
-						//cout << "calculating distance " << endl;
-						distance = 0;
-
-						// calculate the distance between (i,j) and (k,l)
-						for (int channel = 0; channel < nb_channels; channel++) {
-							//printf("channel %d : (%f, %f)\n", channel, p[j * nb_channels + channel], p2[c * nb_channels + channel]);
-							distance += pow(p[j * nb_channels + channel] - p2[c * nb_channels + channel], 2);
-						}
-
-						distance = sqrt(distance);
-
-						if(distance > coreDistance){
-							coreDistance = distance;
-						}
-
-						if(distance < min_d){
-
-							//int from = i * dataset.rows + j;
-							to = r * dataset.rows + c;
-							min_d = distance;
-
-							// If this edge does not exist
-							if((*nearestMRDNeighbors)[to] != from){
-								min_r = r;
-								min_c = c;
-							}
-						}
-					} else if(r == i && c == j){
-						distance = 0;
-					}
-
-					//printf("(%d, %d) : (%d, %d) -> (%f, %f, %f)\n", i, j, r, c, distance, coreDistance, min_d);
-					//ds.at<float>(r,c) = distance;
-					//++c;
-				}
-				//++r;
-			}
-			//cout << from << " " << to << " " << min_d << endl;
-			//printf("(%d, %d), (%d, %d) -> %f\n", i, j, min_r, min_c, min_d);
-			//printf("size (otherVertexIndices, nearestMRDNeighbors, weights) = (%d, %d, %d)\n", otherVertexIndices->size(), nearestMRDNeighbors->size(), weights->size());
-			(*otherVertexIndices)[from] = from;
-			(*nearestMRDNeighbors)[from] = to;
-			(*weights)[from] = coreDistance;
-
-			if (selfEdges) {
-				(*otherVertexIndices)[from + size - 1] = from;
-				(*nearestMRDNeighbors)[from + size - 1] = from;
-				(*weights)[from + size - 1] = coreDistance;
-			}
-		}
-	}
-	//mst = new UndirectedGraph(size, nearestMRDNeighbors, otherVertexIndices, weights);
-	//printf("Dimensions: (%d, %d) -> \n", dataset.rows, dataset.cols);
-	//cout << "Printing graph" << endl;
-	//mst.print();
-	//cout << "Done" << endl;
 }*/
 
-void hdbscan::constructMST() {
+template <class T1>
+void hdbscan<T1>::constructMST() {
 
 	//float* distances = distanceFunction.getDistance();
 	float* coreDistances = distanceFunction.getCoreDistances();
@@ -462,7 +354,8 @@ void hdbscan::constructMST() {
  * @param clusters A list of Clusters forming a cluster tree
  * @return true if there are any clusters with infinite stability, false otherwise
  */
-bool hdbscan::propagateTree() {
+template <class T1>
+bool hdbscan<T1>::propagateTree() {
 
 	map<int, Cluster*> clustersToExamine;
 
@@ -522,7 +415,8 @@ bool hdbscan::propagateTree() {
  * @param delimiter The delimiter for the output file
  * @param infiniteStability true if there are any clusters with infinite stability, false otherwise
  */
-void hdbscan::calculateOutlierScores(vector<float>* pointNoiseLevels,
+template <class T1>
+void hdbscan<T1>::calculateOutlierScores(vector<float>* pointNoiseLevels,
 		vector<int>* pointLastClusters, bool infiniteStability) {
 
 	float* coreDistances = distanceFunction.getCoreDistances();
@@ -589,7 +483,8 @@ void hdbscan::calculateOutlierScores(vector<float>* pointNoiseLevels,
  * @param edgeWeight The edge weight at which to remove the points from their previous Cluster
  * @return The new Cluster, or NULL if the clusterId was 0
  */
-Cluster* hdbscan::createNewCluster(set<int>* points, vector<int>* clusterLabels,
+template <class T1>
+Cluster* hdbscan<T1>::createNewCluster(set<int>* points, vector<int>* clusterLabels,
 		Cluster* parentCluster, int clusterLabel, float edgeWeight) {
 
 	for (set<int>::iterator it = points->begin(); it != points->end(); ++it) {
@@ -619,7 +514,8 @@ Cluster* hdbscan::createNewCluster(set<int>* points, vector<int>* clusterLabels,
  * @param constraints An vector of constraints
  * @param clusterLabels an array of current cluster labels for points
  */
-void hdbscan::calculateNumConstraintsSatisfied(set<int>& newClusterLabels, vector<int>& currentClusterLabels) {
+template <class T1>
+void hdbscan<T1>::calculateNumConstraintsSatisfied(set<int>& newClusterLabels, vector<int>& currentClusterLabels) {
 
 	if (constraints.empty()) {
 		return;
@@ -693,21 +589,24 @@ void hdbscan::calculateNumConstraintsSatisfied(set<int>& newClusterLabels, vecto
 	}
 }
 
-vector<int>& hdbscan::getClusterLabels() {
+template <class T1>
+vector<int>& hdbscan<T1>::getClusterLabels() {
 	return clusterLabels;
 }
 
-map<int, float>& hdbscan::getClusterStabilities(){
+template <class T1>
+map<int, float>& hdbscan<T1>::getClusterStabilities(){
 	return clusterStabilities;
 }
 
 /*
-MatrixXf hdbscan::getDataSet() {
+MatrixXf hdbscan<T1>::getDataSet() {
 	return dataSet;
 }
 */
 
-vector<Cluster*>& hdbscan::getClusters() {
+template <class T1>
+vector<Cluster*>& hdbscan<T1>::getClusters() {
 	return clusters;
 }
 
@@ -729,7 +628,8 @@ vector<Cluster*>& hdbscan::getClusters() {
  * @return The cluster tree
  * @throws IOException If any errors occur opening or writing to the files
  */
-void hdbscan::computeHierarchyAndClusterTree(bool compactHierarchy, vector<float>* pointNoiseLevels, vector<int>* pointLastClusters) {
+template <class T1>
+void hdbscan<T1>::computeHierarchyAndClusterTree(bool compactHierarchy, vector<float>* pointNoiseLevels, vector<int>* pointLastClusters) {
 
 	//mst.print();
 	int lineCount = 0; // Indicates the number of lines written into
@@ -1000,33 +900,33 @@ uint getDatasetSize(int rows, int cols, bool rowwise){
     }
 }
 
-void hdbscan::run(vector<double>& dataset){
+template <class T1>
+void hdbscan<T1>::run(vector<T1>& dataset){
 
     this->run(dataset, (int)dataset.size(), 1, false);
 }
 
-
-void hdbscan::run(vector<double>& dataset, int rows, int cols, bool rowwise){
+template <class T1>
+void hdbscan<T1>::run(vector<T1>& dataset, int rows, int cols, bool rowwise){
     numPoints = getDatasetSize(rows, cols, rowwise);
     this->run();
 }
 
-void hdbscan::run(double* dataset, int size){
+template <class T1>
+void hdbscan<T1>::run(T1* dataset, int size){
     this->run(dataset, size, 1, false);
 }
 
-void hdbscan::run(double* dataset, int rows, int cols, bool rowwise){
+template <class T1>
+void hdbscan<T1>::run(T1* dataset, int rows, int cols, bool rowwise){
     numPoints = getDatasetSize(rows, cols, rowwise);
+    this->distanceFunction.computeDistance(dataset, rows, cols, true, minPoints-1);
     this->run();
 }
 
-void hdbscan::run(Mat& dataset){
-    numPoints = getDatasetSize(dataset.rows, dataset.cols, true);
-    this->distanceFunction.cvComputeDistance(dataset, minPoints-1);
-    this->run();
-}
 
-void hdbscan::run() {
+template <class T1>
+void hdbscan<T1>::run() {
 
 	constructMST();
 	mst.quicksortByEdgeWeight();
@@ -1037,7 +937,8 @@ void hdbscan::run() {
 	findProminentClusters(infiniteStability);
 }
 
-void hdbscan::findProminentClusters(bool infiniteStability){
+template <class T1>
+void hdbscan<T1>::findProminentClusters(bool infiniteStability){
 	vector<Cluster*>* solution = clusters[1]->getPropagatedDescendants();
 
 	clusterLabels = findProminentClusters(infiniteStability, solution);
@@ -1048,7 +949,8 @@ void hdbscan::findProminentClusters(bool infiniteStability){
  * returns an array of labels.  propagateTree() must be called before calling this method.
  * @param infiniteStability true if there are any clusters with infinite stability, false otherwise
  */
-vector<int> hdbscan::findProminentClusters(bool infiniteStability, vector<Cluster*>* solution) {
+template <class T1>
+vector<int> hdbscan<T1>::findProminentClusters(bool infiniteStability, vector<Cluster*>* solution) {
 
 
 	clusterStabilities.insert(pair<int, float>(0, 0.0f));
@@ -1101,14 +1003,22 @@ vector<int> hdbscan::findProminentClusters(bool infiniteStability, vector<Cluste
 	return labels;
 }
 
-bool hdbscan::compareClusters(Cluster* one, Cluster* two){
+template <class T1>
+bool hdbscan<T1>::compareClusters(Cluster* one, Cluster* two){
 
 	return one == two;
 }
 
-void hdbscan::clean(){
+template <class T1>
+void hdbscan<T1>::clean(){
 
 }
+template class hdbscan<float>;
+template class hdbscan<double>;
+template class hdbscan<int>;
+template class hdbscan<long>;
+template class hdbscan<unsigned int>;
+template class hdbscan<unsigned long>;
 
 }
 /* namespace clustering */

@@ -12,11 +12,9 @@
 #include <cstddef>
 #include <algorithm>
 #include <vector>
-#include <opencv/cv.hpp>
 #include <omp.h>
 
 using namespace std;
-using namespace cv;
 
 namespace clustering {
 namespace distance {
@@ -29,19 +27,17 @@ namespace distance {
 
 typedef unsigned int calculator;
 
+template <class T>
 class DistanceCalculator{
 
 public:
 	DistanceCalculator(calculator cal = _EUCLIDEAN);
 	~DistanceCalculator();
-	void computeDistance(float* dataset, int rows, int cols, int numNeighbors);
-	void cvComputeDistance(vector<Mat>& dataset, int minPoints, bool indexed);
-	void cvComputeDistance(Mat& dataset, int minPoints);
-    void computeDistance(vector<float>& dataset, int rows, int cols, bool rowwise, int minPoints);
-    void computeDistance(float* dataset, int rows, int cols, bool rowwise, int minPoints);
+	void computeDistance(T* dataset, int rows, int cols, int numNeighbors);
+    void computeDistance(vector<T>& dataset, int rows, int cols, bool rowwise, int minPoints);
+    void computeDistance(T* dataset, int rows, int cols, bool rowwise, int minPoints);
 
 	float* getDistance();
-	//float* getSortedDistance();
 	float* getCoreDistances();
 
 	/**
@@ -62,20 +58,18 @@ private:
 	/**
 	 * Computes the euclidean distance between two points, d = sqrt((x1-y1)^2 + (x2-y2)^2 + ... + (xn-yn)^2).
 	 */
-	void do_euclidean(float* dataset, int minPoints);
+	void do_euclidean(T* dataset, int minPoints);
 
-	void do_euclidean(vector<Mat>* dataset, int numNeighbors, bool includeIndex);
-	void do_euclidean(Mat& dataset, int numNeighbors);
     void do_euclidean(void* dataset, int minPoints, bool rowwise, bool isVector);
 	/**
 	 * Computes cosine similarity between two points, d = 1 - ((X�Y) / (||X||*||Y||))
 	 */
-	void do_cosine(float* dataset, int minPoints);
+	void do_cosine(T* dataset, int minPoints);
 
 	/**
 	 * Computes the manhattan distance between two points, d = |x1-y1| + |x2-y2| + ... + |xn-yn|.
 	 */
-	void do_manhattan(float* dataset, int minPoints);
+	void do_manhattan(T* dataset, int minPoints);
 
 	/**
 	 * Computes the euclidean distance between two points, d = 1 - (cov(X,Y) / (std_dev(X) * std_dev(Y)))
@@ -83,12 +77,12 @@ private:
 	 * @param dataset
 	 * @param minPoints
 	 */
-	void do_pearson(float* dataset, int minPoints);
+	void do_pearson(T* dataset, int minPoints);
 
 	/**
 	 * Computes the supremum distance between two points, d = max[(x1-y1), (x2-y2), ... ,(xn-yn)].
 	 */
-	void do_supremum(float* dataset, int minPoints);
+	void do_supremum(T* dataset, int minPoints);
 
 	/**
 	 * Calculates the n_th triangular number
@@ -99,11 +93,12 @@ private:
 
 	uint triangular(uint n);
 
-	void addDistance(uint i, uint j, float distance);
-
+	void addDistance(uint i, uint j, T distance);
     double getElement(void* dataset, int index, bool isVector);
     void setDimenstions(int rows, int cols);
 };
+
+
 }
 }
 

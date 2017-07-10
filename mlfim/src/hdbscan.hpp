@@ -33,10 +33,11 @@ namespace clustering {
 
 string getWarningMessage();
 
+template <class T1>
 class hdbscan {
 
 private:
-	DistanceCalculator distanceFunction;
+	DistanceCalculator<T1> distanceFunction;
 	UndirectedGraph mst;
 	vector<Constraint*> constraints;
 	vector<Cluster*> clusters;
@@ -68,18 +69,16 @@ private:
 	Cluster* createNewCluster(set<int>* points,
 			vector<int>* clusterLabels, Cluster* parentCluster, int clusterLabel,
 			float edgeWeight);
+
+	void run();
 public:
 	hdbscan();
 	hdbscan(calculator cal, uint minPoints, uint minClusterSize);
-	hdbscan(float* dataSet, int rows, int cols, calculator cal, uint minPoints, uint minClusterSize);
-	hdbscan(vector<vector<float> > dataSet, calculator cal, uint minPoints, uint minClusterSize);
-	hdbscan(Mat& dataset, calculator cal, uint minPoints, uint minClusterSize);
 	~hdbscan();
 
 	vector<Cluster*>& getClusters();
 	vector<int>& getClusterLabels();
 	map<int, float>& getClusterStabilities();
-	//MatrixXf getDataSet();
 
 	/**
 	 * Reads in the input data set from the file given, assuming the delimiter separates attributes
@@ -92,13 +91,11 @@ public:
 	/**
 	 *
 	 */
-	void run();
 	void cvRun(bool useDataset);
-	void run(vector<double>& dataset);
-	void run(vector<double>& dataset, int rows, int cols, bool rowwise);
-	void run(double* dataset, int size);
-	void run(double* dataset, int rows, int cols, bool rowwise);
-	void run(Mat& dataset);
+	void run(vector<T1>& dataset);
+	void run(vector<T1>& dataset, int rows, int cols, bool rowwise);
+	void run(T1* dataset, int size);
+	void run(T1* dataset, int rows, int cols, bool rowwise);
 
 	/**
 	 * Reads in constraints from the file given, assuming the delimiter separates the points involved
@@ -114,20 +111,8 @@ public:
 	 * @param k Each point's core distance will be it's distance to the kth nearest neighbor
 	 * @param distanceFunction A DistanceCalculator to compute distances between points
 	 */
-	void calculateCoreDistances(float* dataSet, int rows, int cols);
-	void calculateCoreDistances(vector<vector<float> >& dataSet);
-
-	void cvCalculateCoreDistances(vector<vector<Point> > contours, Mat frame, Mat flow);
-	void cvCalculateCoreDistances(vector<vector<Point> > contours, vector<Mat> dataset);
-	void calculateCoreDistances(vector<Point> contour, vector<Mat> dataset);
-
-	/**
-	 * Calculates the core distances using the corresponding values in
-	 * the dataset matrices.
-	 *
-	 * @param dataset A vector of single channel matrices
-	 */
-	void cvCalculateCoreDistances(vector<Mat> dataset, bool indexed);
+	void calculateCoreDistances(T1* dataSet, int rows, int cols);
+	void calculateCoreDistances(vector<vector<T1> >& dataSet);
 
 	/**
 	 * Constructs the minimum spanning tree of mutual reachability distances for the data set, given
@@ -138,7 +123,6 @@ public:
 	 * @param distanceFunction A DistanceCalculator to compute distances between points
 	 */
 	void constructMST();
-	void constructMST(Mat& src);
 
 	/**
 	 * Computes the hierarchy and cluster tree from the minimum spanning tree, writing both to file,
