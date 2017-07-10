@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 	map<int, int> cmaps;
 
 	cv::CommandLineParser parser(argc, argv,
-						"{help||}{m|s|}{i1||}"
+						"{help||}{m|1|}{i1||}"
 						"{i2||}{o||}{minPts|3|}"
 						"{maxPts||}");
 
@@ -153,13 +153,13 @@ int main(int argc, char** argv) {
 		cout << "**********************************************************" << endl;
 		printf("Running hdbscan with %d minPts.\n", i);
 		Mat x = getColourDataset(queryImage, queryKp);
-		hdbscan scan(_EUCLIDEAN, i, i);
-		scan.run(x);
+		hdbscan<float> scan(_EUCLIDEAN, i, i);
+		scan.run(x.ptr<float>(), x.rows, x.cols, true);
 		labelscl = scan.getClusterLabels();
 		set<int> lset(labelscl.begin(), labelscl.end());
 
-		hdbscan scan2(_EUCLIDEAN, i, i);
-		scan2.run(dataset);
+		hdbscan<float> scan2(_EUCLIDEAN, i, i);
+		scan2.run(dataset.ptr<float>(), dataset.rows, dataset.cols, true);
 		labelskp = scan2.getClusterLabels();
 		set<int> lset2(labelskp.begin(), labelskp.end());
 
@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
 		}
 
 		cout << endl;
-		Mat dset;
+		/*Mat dset;
 		vector<KeyPoint> dsetKp;
 		for(map_t::iterator it = mpcl.begin(); it != mpcl.end(); ++it){
 			printf("mpcl: Cluster %d has %lu elements\n", it->first, it->second.size());
@@ -279,7 +279,7 @@ int main(int argc, char** argv) {
 			}
 		}
 
-		cout << endl;
+		cout << endl;*/
 		for(map_t::iterator it = mpkp.begin(); it != mpkp.end(); ++it){
 			printf("mpkp: Cluster %d has %lu elements\n", it->first, it->second.size());
 
@@ -296,8 +296,8 @@ int main(int argc, char** argv) {
 		/**
 		 * Run hdbscan on selected colours
 		 */
-		hdbscan scans(_EUCLIDEAN, 3, 3);
-		scans.run(dset);
+		/*hdbscan<float> scans(_EUCLIDEAN, 3, 3);
+		scans.run(dset.ptr<float>(), dset.rows, dset.cols, true);
 		labelskps = scans.getClusterLabels();
 		set<int> lsetkps(labelskps.begin(), labelskps.end());
 
@@ -333,7 +333,7 @@ int main(int argc, char** argv) {
 		}
 		Mat g = drawKeyPoints(queryImage, dsetKp, Scalar(0, 0, 255), -1);
 		printImage(sokps, 1, "all_selected", g);
-		printImage(sokps, 1, "all_other", x2);
+		printImage(sokps, 1, "all_other", x2);*/
 
 		cout << "**********************************************************" << endl << endl;
 	}

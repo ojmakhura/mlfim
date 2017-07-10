@@ -679,8 +679,8 @@ map<int, int> splitROIPoints(framed& f, framed& f1){
 		f1.ogsize = f1.dataset.rows;
 		f1.hasRoi = f.hasRoi;
 
-		hdbscan sc(f1.dataset, _EUCLIDEAN, 4, 4);
-		sc.run();
+		hdbscan<float> sc(_EUCLIDEAN, 4, 4);
+		sc.run(f1.dataset.ptr<float>(), f1.dataset.rows, f1.dataset.cols, true);
 		f1.labels = sc.getClusterLabels();
 		mapKeyPoints(f1);
 
