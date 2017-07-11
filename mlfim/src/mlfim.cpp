@@ -153,10 +153,10 @@ int main(int argc, char** argv) {
 		cout << "**********************************************************" << endl;
 		printf("Running hdbscan with %d minPts.\n", i);
 		Mat x = getColourDataset(queryImage, queryKp);
-		hdbscan<float> scan(_EUCLIDEAN, i, i);
+		/*hdbscan<float> scan(_EUCLIDEAN, i, i);
 		scan.run(x.ptr<float>(), x.rows, x.cols, true);
 		labelscl = scan.getClusterLabels();
-		set<int> lset(labelscl.begin(), labelscl.end());
+		set<int> lset(labelscl.begin(), labelscl.end());*/
 
 		hdbscan<float> scan2(_EUCLIDEAN, i, i);
 		scan2.run(dataset.ptr<float>(), dataset.rows, dataset.cols, true);
@@ -166,44 +166,44 @@ int main(int argc, char** argv) {
 		set_t stcl, stkp, stcm;
 		if(mode == 2){
 			cout << "Loading sets." << endl;
-			stcl.insert(labelscl.begin()+ogsize, labelscl.end());
+			//stcl.insert(labelscl.begin()+ogsize, labelscl.end());
 			stkp.insert(labelskp.begin()+ogsize, labelskp.end());
 		}
-		qsetcl.push_back(stcl);
+		//qsetcl.push_back(stcl);
 		qsetkp.push_back(stkp);
 
 		cout << "Loading cluster maps." << endl;
 		map_t mpcl, mpkp;
 		map<int, vector<KeyPoint>> kpmapcl, kpmapkp, kpmapkps;
-		for(size_t i = 0; i < labelscl.size(); i++){
-			int label = labelscl[i];
-			mpcl[label].push_back(i);
-			kpmapcl[label].push_back(datasetKp[i]);
+		for(size_t i = 0; i < labelskp.size(); i++){
+			int label;// = labelscl[i];
+			/*mpcl[label].push_back(i);
+			kpmapcl[label].push_back(datasetKp[i]);*/
 
 			label = labelskp[i];
 			mpkp[label].push_back(i);
 			kpmapkp[label].push_back(datasetKp[i]);
 
 		}
-		clustercl.push_back(mpcl);
+		//clustercl.push_back(mpcl);
 		clusterkp.push_back(mpkp);
-		printf("Found %lu clusters in mpcl.\n", mpcl.size()-1);
+		//printf("Found %lu clusters in mpcl.\n", mpcl.size()-1);
 		printf("Found %lu clusters in mpkp.\n", mpkp.size()-1);
 
 		String socl, sokp, sokps;
 		if(parser.has("o")){
 			String fld = parser.get<String>("o");
-			String co = fld, co2 = fld, co3 = fld;
+			String co2 = fld, co3 = fld;
 
-			co += "/colour/";
+			//co += "/colour/";
 			co2 += "/keypoints/";
 			co3 += "/selected/";
 
-			co += to_string(i);
+			//co += to_string(i);
 			co2 += to_string(i);
 			co3 += to_string(i);
 
-			String command = "mkdir \'";
+			/*String command = "mkdir \'";
 			command += co;
 			command += "\'";
 			printf(command.c_str());
@@ -212,9 +212,9 @@ int main(int argc, char** argv) {
 			{
 			    printf("Error creating directory!n");
 			    exit(1);
-			}
+			}*/
 
-			command = "mkdir \'";
+			String command = "mkdir \'m";
 			command += co2;
 			command += "\'";
 			printf(command.c_str());
@@ -234,7 +234,7 @@ int main(int argc, char** argv) {
 				exit(1);
 			}
 
-			socl = co;
+			//socl = co;
 			sokp = co2;
 			sokps = co3;
 		}
@@ -334,6 +334,8 @@ int main(int argc, char** argv) {
 		Mat g = drawKeyPoints(queryImage, dsetKp, Scalar(0, 0, 255), -1);
 		printImage(sokps, 1, "all_selected", g);
 		printImage(sokps, 1, "all_other", x2);*/
+
+
 
 		cout << "**********************************************************" << endl << endl;
 	}
