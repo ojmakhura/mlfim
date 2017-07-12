@@ -57,11 +57,12 @@ Mat getColourDataset(Mat f, vector<KeyPoint> pts){
 	return m;
 }
 
-Mat getSelected(Mat desc, vector<KeyPoint> kps, vector<int> indices){
+Mat getSelected(Mat desc, vector<int> indices){
 	Mat m;
 	for(size_t i = 0; i < indices.size(); i++){
 		if(m.empty()){
 			m = desc.row(indices[i]);
+
 		} else{
 			m.push_back(desc.row(indices[i]));
 		}
@@ -110,6 +111,72 @@ void printCoreDistances(map<int, float> cores, String folder){
 
 void execute(Mat dataset){
 
+}
+
+map_t mapClusters(map<int, vector<KeyPoint>>& cmap, vector<int> labels, map<int, float>& coreDisMap, float* core, vector<KeyPoint> keypoints){
+
+	map_t amap;
+	for (size_t i = 0; i < labels.size(); i++) {
+		int label;
+
+		label = labels[i];
+		amap[label].push_back(i);
+		cmap[label].push_back(keypoints[i]);
+
+		//printf("core at %d is %f.\n", i, core[i]);
+		if (coreDisMap.find(label) == coreDisMap.end()) {
+			coreDisMap[label] = core[i];
+		} else {
+			if (coreDisMap[label] < core[i]) {
+				coreDisMap[label] = core[i];
+			}
+		}
+
+	}
+	printf("Found %lu clusters in mpkp.\n", amap.size());
+
+	return amap;
+}
+
+String createOutpuDirs(CommandLineParser parser, String& mainFolder, String subfolder, int i){
+	String sokp;
+	if (parser.has("o")) {
+		String fld = parser.get<String>("o");
+		mainFolder = fld;
+
+		mainFolder += subfolder;
+
+		sokp = mainFolder;
+		sokp += to_string(i);
+
+		String command = "mkdir \'";
+		command += sokp;
+		command += "\'";
+		printf(command.c_str());
+		const int dir_err2 = system(command.c_str());
+		if (-1 == dir_err2) {
+			printf("Error creating directory!n");
+			exit(1);
+		}
+
+	}
+
+	return sokp;
+
+}
+
+void printMapImages(Mat image, map_t inMap, map<int, vector<KeyPoint>> kpmap, String folder, bool hasOut){
+
+	for(map_t::iterator it = inMap.begin(); it != inMap.end(); ++it){
+		printf("mpkp: Cluster %d has %lu elements\n", it->first, it->second.size());
+
+		if(hasOut){
+			String imageName = "frame_keypoints_";
+			imageName += to_string(it->first);
+			Mat m = drawKeyPoints(image, kpmap[it->first], Scalar(0, 0, 255), -1);
+			printImage(folder, 1, imageName, m);
+		}
+	}
 }
 
 
@@ -195,16 +262,12 @@ int main(int argc, char** argv) {
 
 	cout << "<<<<<<< Starting the " << endl;
 	for(int i = minPts; i <= maxPts; i++){
-		map<int, float> coreDisMap;
+		map<int, float> coreDisMap, coreDisMap0;
 		cout << "**********************************************************" << endl;
 		printf("Running hdbscan with %d minPts.\n", i);
-		Mat x = getColourDataset(queryImage, queryKp);
-		/*hdbscan<float> scan(_EUCLIDEAN, i, i);
-		scan.run(x.ptr<float>(), x.rows, x.cols, true);
-		labelscl = scan.getClusterLabels();
-		set<int> lset(labelscl.begin(), labelscl.end());*/
+		//Mat x = getColourDataset(queryImage, queryKp);
 
-		hdbscan<float> scan2(_EUCLIDEAN, i, i);
+		hdbscan<float> scan2(_EUCLIDEAN, i);
 		scan2.run(dataset.ptr<float>(), dataset.rows, dataset.cols, true);
 		labelskp = scan2.getClusterLabels();
 		set<int> lset2(labelskp.begin(), labelskp.end());
@@ -212,89 +275,20 @@ int main(int argc, char** argv) {
 		set_t stcl, stkp, stcm;
 		if(mode == 2){
 			cout << "Loading sets." << endl;
-			//stcl.insert(labelscl.begin()+ogsize, labelscl.end());
 			stkp.insert(labelskp.begin()+ogsize, labelskp.end());
 		}
-		//qsetcl.push_back(stcl);
+
 		qsetkp.push_back(stkp);
 		float* core = scan2.getCoreDistances();
 		cout << "Loading cluster maps." << endl;
-		map_t mpcl, mpkp;
-		map<int, vector<KeyPoint>> kpmapcl, kpmapkp, kpmapkps;
-		for(size_t i = 0; i < labelskp.size(); i++){
-			int label;// = labelscl[i];
-			/*mpcl[label].push_back(i);
-			kpmapcl[label].push_back(datasetKp[i]);*/
+		map_t mpkp;
+		map<int, vector<KeyPoint>> kpmapkp, kpmapkp0;
 
-			label = labelskp[i];
-			mpkp[label].push_back(i);
-			kpmapkp[label].push_back(datasetKp[i]);
-
-			//printf("core at %d is %f.\n", i, core[i]);
-			if(coreDisMap.find(label) == coreDisMap.end()){
-				coreDisMap[label] = core[i];
-			} else{
-				if(coreDisMap[label] < core[i]){
-					coreDisMap[label] = core[i];
-				}
-			}
-
-		}
-		//clustercl.push_back(mpcl);
+		mpkp = mapClusters(kpmapkp, labelskp, coreDisMap, core, datasetKp);
 		clusterkp.push_back(mpkp);
-		//printf("Found %lu clusters in mpcl.\n", mpcl.size()-1);
-		printf("Found %lu clusters in mpkp.\n", mpkp.size());
 		cmaps[i] = mpkp.size();
 
-		String socl, sokp, sokps;
-		if(parser.has("o")){
-			String fld = parser.get<String>("o");
-			keypointsFolder = fld;
-			selectedFolder = fld;
-
-			//co += "/colour/";
-			keypointsFolder += "/keypoints/";
-			selectedFolder += "/selected/";
-
-			//co += to_string(i);
-			sokp = keypointsFolder;
-			sokp += to_string(i);
-
-			sokps = selectedFolder;
-			sokps += to_string(i);
-
-			/*String command = "mkdir \'";
-			command += co;
-			command += "\'";
-			printf(command.c_str());
-			const int dir_err = system(command.c_str());
-			if (-1 == dir_err)
-			{
-			    printf("Error creating directory!n");
-			    exit(1);
-			}*/
-
-			String command = "mkdir \'";
-			command += sokp;
-			command += "\'";
-			printf(command.c_str());
-			const int dir_err2 = system(command.c_str());
-			if (-1 == dir_err2) {
-				printf("Error creating directory!n");
-				exit(1);
-			}
-
-			command = "mkdir \'";
-			command += sokps;
-			command += "\'";
-			printf(command.c_str());
-			const int dir_err3 = system(command.c_str());
-			if (-1 == dir_err3) {
-				printf("Error creating directory!n");
-				exit(1);
-			}
-
-		}
+		String sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/", i);
 
 		cout << endl;
 		/*Mat dset;
@@ -337,18 +331,8 @@ int main(int argc, char** argv) {
 		}
 
 		cout << endl;*/
-		for(map_t::iterator it = mpkp.begin(); it != mpkp.end(); ++it){
-			printf("mpkp: Cluster %d has %lu elements\n", it->first, it->second.size());
 
-			if(parser.has("o")){
-				String imageName = "frame_keypoints_";
-				imageName += to_string(it->first);
-				String ofile = sokp;
-				//sokp += "/";
-				Mat m = drawKeyPoints(queryImage, kpmapkp[it->first], Scalar(0, 0, 255), -1);
-				printImage(sokp, 1, imageName, m);
-			}
-		}
+		printMapImages(queryImage, mpkp, kpmapkp, sokp, parser.has("o"));
 
 		/**
 		 * Run hdbscan on selected colours
@@ -394,6 +378,21 @@ int main(int argc, char** argv) {
 
 
 		printCoreDistances(coreDisMap, sokp);
+
+		vector<KeyPoint> newKp;
+		newKp.insert(newKp.end(), kpmapkp[0].begin(), kpmapkp[0].end());
+		Mat dset = getSelected(queryDesc, mpkp[0]).clone();
+		hdbscan<float> scans(_EUCLIDEAN, 3);
+		scans.run(dset.ptr<float>(), dset.rows, dset.cols, true);
+		labelskps = scans.getClusterLabels();
+		set<int> lsetkps(labelskps.begin(), labelskps.end());
+		float* core0 = scan2.getCoreDistances();
+
+		map_t mpkp0 = mapClusters(kpmapkp0, labelskps, coreDisMap, core0, newKp);
+		sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/cluster0/", i);
+		printCoreDistances(coreDisMap, sokp);
+		printMapImages(queryImage, mpkp0, kpmapkp0, sokp, parser.has("o"));
+
 		cout << "**********************************************************" << endl << endl;
 	}
 

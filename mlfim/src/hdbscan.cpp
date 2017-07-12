@@ -44,7 +44,6 @@ string getWarningMessage() {
 template <class T1>
 hdbscan<T1>::hdbscan(){
 	this->minPoints = 0;
-	this->minClusterSize = 0;
 	distanceFunction.setCalculator(_EUCLIDEAN);
 	distanceFunction.setCalculator(_EUCLIDEAN);
 	selfEdges = true;
@@ -53,9 +52,8 @@ hdbscan<T1>::hdbscan(){
 }
 
 template <class T1>
-hdbscan<T1>::hdbscan(calculator cal, uint minPoints, uint minClusterSize) {
+hdbscan<T1>::hdbscan(calculator cal, uint minPoints) {
 	this->minPoints = minPoints;
-	this->minClusterSize = minClusterSize;
 	distanceFunction.setCalculator(cal);
 	selfEdges = true;
 	numPoints = 0;
@@ -731,7 +729,7 @@ void hdbscan<T1>::computeHierarchyAndClusterTree(bool compactHierarchy, vector<f
 
 					//Check if this potential child cluster is a valid cluster:
 					if (!incrementedChildCount
-							&& constructingSubCluster.size() >= minClusterSize
+							&& constructingSubCluster.size() >= minPoints
 							&& anyEdges) {
 						incrementedChildCount = true;
 						numChildClusters++;
@@ -747,7 +745,7 @@ void hdbscan<T1>::computeHierarchyAndClusterTree(bool compactHierarchy, vector<f
 
 				//If there could be a split, and this child cluster is valid:
 				if (numChildClusters >= 2
-						&& constructingSubCluster.size() >= minClusterSize
+						&& constructingSubCluster.size() >= minPoints
 						&& anyEdges) {
 					//Check this child cluster is not equal to the unexplored first child cluster:
 					it = firstChildCluster.rbegin();
@@ -773,7 +771,7 @@ void hdbscan<T1>::computeHierarchyAndClusterTree(bool compactHierarchy, vector<f
 				}
 
 				//If this child cluster is not valid cluster, assign it to noise:
-				else if (constructingSubCluster.size() < minClusterSize
+				else if (constructingSubCluster.size() < minPoints
 						|| !anyEdges) {
 
 					createNewCluster(

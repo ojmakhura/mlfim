@@ -46,7 +46,7 @@ private:
 	map<int, float> clusterStabilities;
 	map<long, vector<int> > hierarchy;
 	bool selfEdges = true;
-	uint minPoints, minClusterSize, numPoints;
+	uint minPoints, numPoints;
 
 	/**
 	 * Calculates the number of constraints satisfied by the new clusters and virtual children of the
@@ -73,7 +73,7 @@ private:
 	void run();
 public:
 	hdbscan();
-	hdbscan(calculator cal, uint minPoints, uint minClusterSize);
+	hdbscan(calculator cal, uint minPts);
 	~hdbscan();
 
 	vector<Cluster*>& getClusters();
