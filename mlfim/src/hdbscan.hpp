@@ -180,6 +180,8 @@ public:
 
 	bool compareClusters(Cluster* one, Cluster* two);
 
+	float* getCoreDistances();
+
 	void clean();
 
 // ------------------------------ PRIVATE METHODS ------------------------------

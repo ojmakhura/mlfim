@@ -70,6 +70,49 @@ Mat getSelected(Mat desc, vector<KeyPoint> kps, vector<int> indices){
 	return m;
 }
 
+void printClusterNumbers(map<int, int> maps, String folder){
+	printf("Printing Cluster numbers to %s.\n", folder.c_str());
+	ofstream myfile;
+	String name = "/clusternumbers.csv";
+	String f = folder;
+	f += name;
+	myfile.open(f.c_str());
+
+	myfile << "minPts, Num Clusters\n";
+
+	for(map<int, int >::iterator it = maps.begin(); it != maps.end(); ++it){
+		myfile << it->first << "," << it->second << ",";
+
+		myfile << "\n";
+	}
+
+	myfile.close();
+}
+
+void printCoreDistances(map<int, float> cores, String folder){
+	printf("Printing core distances to %s.\n", folder.c_str());
+	ofstream myfile;
+	String name = "/coredistances.csv";
+	String f = folder;
+	f += name;
+	myfile.open(f.c_str());
+
+	myfile << "Cluster, Core Distance\n";
+
+	for(map<int, float >::iterator it = cores.begin(); it != cores.end(); ++it){
+		myfile << it->first << "," << it->second << ",";
+
+		myfile << "\n";
+	}
+
+	myfile.close();
+}
+
+void execute(Mat dataset){
+
+}
+
+
 int main(int argc, char** argv) {
 	ocl::setUseOpenCL(true);
 	String queryName, trainName, outFolder;
@@ -81,6 +124,8 @@ int main(int argc, char** argv) {
 	vector<set_t> qsetcl, qsetkp, qsetkps; // set of query cluster labels
 	vector<map_t> clustercl, clusterkp, clusterkps;
 	map<int, int> cmaps;
+
+	String keypointsFolder , selectedFolder;
 
 	cv::CommandLineParser parser(argc, argv,
 						"{help||}{m|1|}{i1||}"
@@ -150,6 +195,7 @@ int main(int argc, char** argv) {
 
 	cout << "<<<<<<< Starting the " << endl;
 	for(int i = minPts; i <= maxPts; i++){
+		map<int, float> coreDisMap;
 		cout << "**********************************************************" << endl;
 		printf("Running hdbscan with %d minPts.\n", i);
 		Mat x = getColourDataset(queryImage, queryKp);
@@ -171,7 +217,7 @@ int main(int argc, char** argv) {
 		}
 		//qsetcl.push_back(stcl);
 		qsetkp.push_back(stkp);
-
+		float* core = scan2.getCoreDistances();
 		cout << "Loading cluster maps." << endl;
 		map_t mpcl, mpkp;
 		map<int, vector<KeyPoint>> kpmapcl, kpmapkp, kpmapkps;
@@ -184,24 +230,38 @@ int main(int argc, char** argv) {
 			mpkp[label].push_back(i);
 			kpmapkp[label].push_back(datasetKp[i]);
 
+			//printf("core at %d is %f.\n", i, core[i]);
+			if(coreDisMap.find(label) == coreDisMap.end()){
+				coreDisMap[label] = core[i];
+			} else{
+				if(coreDisMap[label] < core[i]){
+					coreDisMap[label] = core[i];
+				}
+			}
+
 		}
 		//clustercl.push_back(mpcl);
 		clusterkp.push_back(mpkp);
 		//printf("Found %lu clusters in mpcl.\n", mpcl.size()-1);
-		printf("Found %lu clusters in mpkp.\n", mpkp.size()-1);
+		printf("Found %lu clusters in mpkp.\n", mpkp.size());
+		cmaps[i] = mpkp.size();
 
 		String socl, sokp, sokps;
 		if(parser.has("o")){
 			String fld = parser.get<String>("o");
-			String co2 = fld, co3 = fld;
+			keypointsFolder = fld;
+			selectedFolder = fld;
 
 			//co += "/colour/";
-			co2 += "/keypoints/";
-			co3 += "/selected/";
+			keypointsFolder += "/keypoints/";
+			selectedFolder += "/selected/";
 
 			//co += to_string(i);
-			co2 += to_string(i);
-			co3 += to_string(i);
+			sokp = keypointsFolder;
+			sokp += to_string(i);
+
+			sokps = selectedFolder;
+			sokps += to_string(i);
 
 			/*String command = "mkdir \'";
 			command += co;
@@ -214,8 +274,8 @@ int main(int argc, char** argv) {
 			    exit(1);
 			}*/
 
-			String command = "mkdir \'m";
-			command += co2;
+			String command = "mkdir \'";
+			command += sokp;
 			command += "\'";
 			printf(command.c_str());
 			const int dir_err2 = system(command.c_str());
@@ -225,7 +285,7 @@ int main(int argc, char** argv) {
 			}
 
 			command = "mkdir \'";
-			command += co3;
+			command += sokps;
 			command += "\'";
 			printf(command.c_str());
 			const int dir_err3 = system(command.c_str());
@@ -234,9 +294,6 @@ int main(int argc, char** argv) {
 				exit(1);
 			}
 
-			//socl = co;
-			sokp = co2;
-			sokps = co3;
 		}
 
 		cout << endl;
@@ -287,7 +344,7 @@ int main(int argc, char** argv) {
 				String imageName = "frame_keypoints_";
 				imageName += to_string(it->first);
 				String ofile = sokp;
-				sokp += "/";
+				//sokp += "/";
 				Mat m = drawKeyPoints(queryImage, kpmapkp[it->first], Scalar(0, 0, 255), -1);
 				printImage(sokp, 1, imageName, m);
 			}
@@ -336,9 +393,11 @@ int main(int argc, char** argv) {
 		printImage(sokps, 1, "all_other", x2);*/
 
 
-
+		printCoreDistances(coreDisMap, sokp);
 		cout << "**********************************************************" << endl << endl;
 	}
+
+	printClusterNumbers(cmaps, keypointsFolder);
 
 	return 0;
 }

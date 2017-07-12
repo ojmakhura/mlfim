@@ -61,28 +61,6 @@ hdbscan<T1>::hdbscan(calculator cal, uint minPoints, uint minClusterSize) {
 	numPoints = 0;
 }
 
-/*template <class T1>
-hdbscan<T1>::hdbscan(T1* dataSet, int rows, int cols, calculator cal,
-		uint minPoints, uint minClusterSize) {
-
-	this->minClusterSize = minClusterSize;
-	this->minPoints = minPoints;
-	distanceFunction.setCalculator(cal);
-	selfEdges = true;
-	calculateCoreDistances(dataSet, rows, cols);
-	numPoints = rows;
-}*/
-
-/*template <class T1>
-hdbscan<T1>::hdbscan(Mat& dataset, calculator cal, uint minPoints, uint minClusterSize){
-	this->minClusterSize = minClusterSize;
-	this->minPoints = minPoints;
-	distanceFunction.setCalculator(cal);
-	selfEdges = true;
-	numPoints = dataset.rows;
-	distanceFunction.cvComputeDistance(dataset, minPoints-1);
-}*/
-
 template <class T1>
 hdbscan<T1>::~hdbscan() {
 
@@ -1007,6 +985,11 @@ template <class T1>
 bool hdbscan<T1>::compareClusters(Cluster* one, Cluster* two){
 
 	return one == two;
+}
+
+template <class T1>
+float* hdbscan<T1>::getCoreDistances(){
+	return this->distanceFunction.getCoreDistances();
 }
 
 template <class T1>
