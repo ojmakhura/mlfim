@@ -378,20 +378,22 @@ int main(int argc, char** argv) {
 
 
 		printCoreDistances(coreDisMap, sokp);
-
+		printf("\n>>>>>>>>>Re clustering for Cluster 0<<<<<<<<<<\n");
 		vector<KeyPoint> newKp;
 		newKp.insert(newKp.end(), kpmapkp[0].begin(), kpmapkp[0].end());
 		Mat dset = getSelected(queryDesc, mpkp[0]).clone();
-		hdbscan<float> scans(_EUCLIDEAN, 3);
-		scans.run(dset.ptr<float>(), dset.rows, dset.cols, true);
-		labelskps = scans.getClusterLabels();
-		set<int> lsetkps(labelskps.begin(), labelskps.end());
-		float* core0 = scan2.getCoreDistances();
+		if(dset.rows > 3){
+			hdbscan<float> scans(_EUCLIDEAN, 3);
+			scans.run(dset.ptr<float>(), dset.rows, dset.cols, true);
+			labelskps = scans.getClusterLabels();
+			set<int> lsetkps(labelskps.begin(), labelskps.end());
+			float* core0 = scan2.getCoreDistances();
 
-		map_t mpkp0 = mapClusters(kpmapkp0, labelskps, coreDisMap, core0, newKp);
-		sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/cluster0/", i);
-		printCoreDistances(coreDisMap, sokp);
-		printMapImages(queryImage, mpkp0, kpmapkp0, sokp, parser.has("o"));
+			map_t mpkp0 = mapClusters(kpmapkp0, labelskps, coreDisMap, core0, newKp);
+			sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/cluster0/", i);
+			printCoreDistances(coreDisMap, sokp);
+			printMapImages(queryImage, mpkp0, kpmapkp0, sokp, parser.has("o"));
+		}
 
 		cout << "**********************************************************" << endl << endl;
 	}
