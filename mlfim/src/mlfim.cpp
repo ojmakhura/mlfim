@@ -173,7 +173,7 @@ void printMapImages(Mat image, map_t inMap, map<int, vector<KeyPoint>> kpmap, St
 		if(hasOut){
 			String imageName = "frame_keypoints_";
 			imageName += to_string(it->first);
-			Mat m = drawKeyPoints(image, kpmap[it->first], Scalar(0, 0, 255), -1);
+			Mat m = drawKeyPoints(image, kpmap[it->first], Scalar(0, 0, 255), -1); //DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
 			printImage(folder, 1, imageName, m);
 		}
 	}
@@ -260,13 +260,17 @@ int main(int argc, char** argv) {
 
 	}
 
+	Mat selDset;
+	vector<KeyPoint> selkp;
+	bool load = true;
 	cout << "<<<<<<< Starting the " << endl;
 	for(int i = minPts; i <= maxPts; i++){
-		map<int, float> coreDisMap, coreDisMap0;
+		map<int, float> coreDisMap, coreDisMap0, coreDisMapCl, coreDisMapSel;
 		cout << "**********************************************************" << endl;
 		printf("Running hdbscan with %d minPts.\n", i);
 		//Mat x = getColourDataset(queryImage, queryKp);
 
+		/******************************************************************************************************************/
 		hdbscan<float> scan2(_EUCLIDEAN, i);
 		scan2.run(dataset.ptr<float>(), dataset.rows, dataset.cols, true);
 		labelskp = scan2.getClusterLabels();
@@ -291,93 +295,11 @@ int main(int argc, char** argv) {
 		String sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/", i);
 
 		cout << endl;
-		/*Mat dset;
-		vector<KeyPoint> dsetKp;
-		for(map_t::iterator it = mpcl.begin(); it != mpcl.end(); ++it){
-			printf("mpcl: Cluster %d has %lu elements\n", it->first, it->second.size());
-
-			if(parser.has("o")){
-				String imageName = "frame_keypoints_";
-				imageName += to_string(it->first);
-				String ofile = socl;
-				socl += "/";
-				Mat m = drawKeyPoints(queryImage, kpmapcl[it->first], Scalar(0, 0, 255), -1);
-				display("choose", m);
-				printImage(socl, 1, imageName, m);
-			}
-
-			// Listen for a key pressed
-			char c = ' ';
-
-			while(true){
-				if (c == 'a') {
-
-					Mat xx = getSelected(queryDesc, queryKp, it->second);
-					dsetKp.insert(dsetKp.end(), kpmapcl[it->first].begin(), kpmapcl[it->first].end());
-					if(dset.empty()){
-						cout << "Clone adding new data for cluster " << it->first << endl;
-						dset = xx.clone();
-					} else{
-						cout << "adding new data for cluster " << it->first << endl;
-						dset.push_back(xx);
-					}
-					break;
-
-				} else if (c == 'q'){
-					break;
-				}
-				c = (char) waitKey(20);
-			}
-		}
-
-		cout << endl;*/
-
 		printMapImages(queryImage, mpkp, kpmapkp, sokp, parser.has("o"));
-
-		/**
-		 * Run hdbscan on selected colours
-		 */
-		/*hdbscan<float> scans(_EUCLIDEAN, 3, 3);
-		scans.run(dset.ptr<float>(), dset.rows, dset.cols, true);
-		labelskps = scans.getClusterLabels();
-		set<int> lsetkps(labelskps.begin(), labelskps.end());
-
-		map_t mpkps;
-		for(size_t i = 0; i < labelskps.size(); i++){
-			int label = labelskps[i];
-			mpkps[label].push_back(i);
-			kpmapkps[label].push_back(dsetKp[i]);
-		}
-		clusterkps.push_back(mpkps);
-		printf("Found %lu clusters in mpcl.\n", mpcl.size()-1);
-
-		cout << endl;
-		Mat x2;
-		for(map_t::iterator it = mpkps.begin(); it != mpkps.end(); ++it){
-			printf("mpkps: Cluster %d has %lu elements\n", it->first, it->second.size());
-
-			if(parser.has("o")){
-				String imageName = "frame_keypoints_";
-				imageName += to_string(it->first);
-				String ofile = sokps;
-				sokps += "/";
-				Mat m = drawKeyPoints(queryImage, kpmapkps[it->first], Scalar(0, 0, 255), -1);
-
-				if(x2.empty() && it->first != 0){
-					x2 = drawKeyPoints(queryImage, kpmapkps[it->first], Scalar(0, 0, 255), -1);
-				} else if(it->first != 0){
-					x2 = drawKeyPoints(x2, kpmapkps[it->first], Scalar(0, 0, 255), -1);
-				}
-
-				printImage(sokps, 1, imageName, m);
-			}
-		}
-		Mat g = drawKeyPoints(queryImage, dsetKp, Scalar(0, 0, 255), -1);
-		printImage(sokps, 1, "all_selected", g);
-		printImage(sokps, 1, "all_other", x2);*/
-
-
 		printCoreDistances(coreDisMap, sokp);
+
+		/******************************************************************************************************************/
+
 		printf("\n>>>>>>>>>Re clustering for Cluster 0<<<<<<<<<<\n");
 		vector<KeyPoint> newKp;
 		newKp.insert(newKp.end(), kpmapkp[0].begin(), kpmapkp[0].end());
@@ -389,16 +311,75 @@ int main(int argc, char** argv) {
 			set<int> lsetkps(labelskps.begin(), labelskps.end());
 			float* core0 = scan2.getCoreDistances();
 
-			map_t mpkp0 = mapClusters(kpmapkp0, labelskps, coreDisMap, core0, newKp);
+			map_t mpkp0 = mapClusters(kpmapkp0, labelskps, coreDisMap0, core0, newKp);
 			sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/cluster0/", i);
-			printCoreDistances(coreDisMap, sokp);
+			printCoreDistances(coreDisMap0, sokp);
 			printMapImages(queryImage, mpkp0, kpmapkp0, sokp, parser.has("o"));
 		}
 
 		cout << "**********************************************************" << endl << endl;
+		/******************************************************************************************************************/
+
+		Mat colour = getColourDataset(queryImage, queryKp).clone();
+		map<int, vector<KeyPoint>> clkpmap;
+		hdbscan<float> scanc(_EUCLIDEAN, 6);
+		scanc.run(colour.ptr<float>(), colour.rows, colour.cols, true);
+		vector<int> labelsc = scanc.getClusterLabels();
+		set<int> lsetkps(labelsc.begin(), labelsc.end());
+		float* corecl = scanc.getCoreDistances();
+		map_t clmap = mapClusters(clkpmap, labelsc, coreDisMapCl, corecl, datasetKp);
+		String socl = createOutpuDirs(parser, keypointsFolder, "/colour/", i);
+		printMapImages(queryImage, clmap, clkpmap, socl, parser.has("o"));
+
+
+		for(map_t::iterator it = clmap.begin(); it != clmap.end() && load; ++it){
+			if (parser.has("o")) {
+				String imageName = "frame_keypoints_";
+				imageName += to_string(it->first);
+				String ofile = socl;
+				socl += "/";
+				Mat m = drawKeyPoints(queryImage, clkpmap[it->first], Scalar(0, 0, 255), -1);
+				display("choose", m);
+				//printImage(socl, 1, imageName, m);
+			}
+
+			// Listen for a key pressed
+			char c = ' ';
+			while(true){
+				if (c == 'a') {
+					Mat xx = getSelected(queryDesc, it->second);
+					selkp.insert(selkp.end(), clkpmap[it->first].begin(), clkpmap[it->first].end());
+					if(selDset.empty()){
+						cout << "Clone adding new data for cluster " << it->first << endl;
+						selDset = xx.clone();
+					} else{
+						cout << "adding new data for cluster " << it->first << endl;
+						selDset.push_back(xx);
+					}
+					break;
+				} else if (c == 'q'){
+					break;
+				}
+				c = (char) waitKey(20);
+			}
+		}
+
+		load = false;
+		map<int, vector<KeyPoint>> selkpmap;
+		hdbscan<float> scans(_EUCLIDEAN, i);
+		scans.run(selDset.ptr<float>(), selDset.rows, selDset.cols, true);
+		vector<int> labelskpsel = scans.getClusterLabels();
+		set<int> lsetsel(labelskpsel.begin(), labelskpsel.end());
+		float* coresel = scans.getCoreDistances();
+
+		map_t selmap = mapClusters(selkpmap, labelskpsel, coreDisMapSel, coresel, selkp);
+		String sosel = createOutpuDirs(parser, keypointsFolder, "/selected/", i);
+		printMapImages(queryImage, selmap, selkpmap, sosel, parser.has("o"));
+
 	}
 
 	printClusterNumbers(cmaps, keypointsFolder);
+
 
 	return 0;
 }
