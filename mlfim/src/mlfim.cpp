@@ -71,6 +71,18 @@ Mat getSelected(Mat desc, vector<int> indices){
 	return m;
 }
 
+float* getPointDataset(vector<KeyPoint> point){
+	float *data = (float*)malloc(point.size() * 2 * sizeof(float));
+
+	for(size_t i = 0; i < point.size(); i++){
+		int idx = i *2;
+		data[idx] = point[i].pt.x;
+		data[idx+1] = point[i].pt.y;
+	}
+
+	return data;
+}
+
 void printClusterNumbers(map<int, int> maps, String folder){
 	printf("Printing Cluster numbers to %s.\n", folder.c_str());
 	ofstream myfile;
@@ -265,7 +277,7 @@ int main(int argc, char** argv) {
 	bool load = true;
 	cout << "<<<<<<< Starting the " << endl;
 	for(int i = minPts; i <= maxPts; i++){
-		map<int, float> coreDisMap, coreDisMap0, coreDisMapCl, coreDisMapSel;
+		map<int, float> coreDisMap, coreDisMap0, coreDisMapCl, coreDisMapSel, coreDisMapId;
 		cout << "**********************************************************" << endl;
 		printf("Running hdbscan with %d minPts.\n", i);
 		//Mat x = getColourDataset(queryImage, queryKp);
@@ -375,6 +387,17 @@ int main(int argc, char** argv) {
 		map_t selmap = mapClusters(selkpmap, labelskpsel, coreDisMapSel, coresel, selkp);
 		String sosel = createOutpuDirs(parser, keypointsFolder, "/selected/", i);
 		printMapImages(queryImage, selmap, selkpmap, sosel, parser.has("o"));
+
+		map<int, vector<KeyPoint>> selidmap;
+		float* data = getPointDataset(selkp);
+		hdbscan<float> idscan(_EUCLIDEAN, 3);
+		idscan.run(data, selkp.size(), 2, true);
+		vector<int> labeldid = idscan.getClusterLabels();
+		set<int> lsetid(labeldid.begin(), labeldid.end());
+		float* coreid = scans.getCoreDistances();
+		map_t idmap = mapClusters(selidmap, labeldid, coreDisMapId, coreid, selkp);
+		String soid = createOutpuDirs(parser, keypointsFolder, "/index/", i);
+		printMapImages(queryImage, idmap, selidmap, soid, parser.has("o"));
 
 	}
 
