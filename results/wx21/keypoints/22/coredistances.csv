@@ -1,2 +1,4 @@
-Cluster, Core Distance
-0,1.14044,
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
+0,0.465421,0.869722,1.86868,0.0224264,1.38574,61.7906
+2,0.22694,0.456958,2.01356,0.00235343,1.38574,588.819
+3,0.330261,0.463153,1.40239,0.0224264,1.2461,55.5637
