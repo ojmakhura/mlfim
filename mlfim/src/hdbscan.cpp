@@ -991,6 +991,16 @@ float* hdbscan<T1>::getCoreDistances(){
 }
 
 template <class T1>
+DistanceCalculator<T1>& hdbscan<T1>::getDistanceFunction(){
+	return distanceFunction;
+}
+
+template <class T1>
+T1 hdbscan<T1>::getDistance(uint i, uint j){
+	return distanceFunction.getDistance(i, j);
+}
+
+template <class T1>
 void hdbscan<T1>::clean(){
 
 }

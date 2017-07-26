@@ -102,7 +102,7 @@ void printClusterNumbers(map<int, int> maps, String folder){
 	myfile.close();
 }
 
-void printCoreDistances(map<int, float> cores, String folder){
+void printDistances(map<int, vector<float>> distances, String folder){
 	printf("Printing core distances to %s.\n", folder.c_str());
 	ofstream myfile;
 	String name = "/coredistances.csv";
@@ -110,10 +110,14 @@ void printCoreDistances(map<int, float> cores, String folder){
 	f += name;
 	myfile.open(f.c_str());
 
-	myfile << "Cluster, Core Distance\n";
+	myfile << "Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio\n";
 
-	for(map<int, float >::iterator it = cores.begin(); it != cores.end(); ++it){
-		myfile << it->first << "," << it->second << ",";
+	for(map<int, vector<float> >::iterator it = distances.begin(); it != distances.end(); ++it){
+		// print min core, max core and core ratio
+		myfile << it->first << "," << it->second[0] << "," << it->second[1] << "," << it->second[1]/it->second[0] << ",";
+
+		// print min distance, max distance and distance ratio
+		myfile << it->second[2] << "," << it->second[3] << "," << it->second[3]/it->second[2];
 
 		myfile << "\n";
 	}
@@ -121,11 +125,65 @@ void printCoreDistances(map<int, float> cores, String folder){
 	myfile.close();
 }
 
-void execute(Mat dataset){
+map<int, vector<float>> getDistances(map_t mp, hdbscan<float>& sc, float* core){
 
+	map<int, vector<float>> pm;
+
+	for(map_t::iterator it = mp.begin(); it != mp.end(); ++it){
+		vector<int> idc = it->second;
+
+		for(size_t i = 0; i < idc.size(); i++){
+
+			// min and max core distances
+			if(pm[it->first].size() == 0){
+				pm[it->first].push_back(core[idc[i]]);
+				pm[it->first].push_back(core[idc[i]]);
+			} else{
+				// min core distance
+				if(pm[it->first][0] > core[idc[i]]){
+					pm[it->first][0] = core[idc[i]];
+				}
+
+				//max core distance
+				if(pm[it->first][1] < core[idc[i]]){
+					pm[it->first][1] = core[idc[i]];
+				}
+			}
+
+			// Calculating min and max distances
+			for(size_t j = i+1; j < idc.size(); j++){
+				float d = sc.getDistance(i, j); // (float)norm(desc.row(i), desc.row(j));
+				//printf("distance is %f, mi\n", d);
+
+				if(pm[it->first].size() == 2){
+					pm[it->first].push_back(d);
+					pm[it->first].push_back(d);
+				} else{
+					// min distance
+					if(pm[it->first][2] > d){
+
+						//printf("min distance sitching %f and %f\n", pm[it->first][2], d);
+						pm[it->first][2] = d;
+					}
+
+					// max distance
+					if(pm[it->first][3] < d){
+						//printf("max distance sitching %f and %f\n", pm[it->first][3], d);
+						pm[it->first][3] = d;
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
+	return pm;
 }
 
-map_t mapClusters(map<int, vector<KeyPoint>>& cmap, vector<int> labels, map<int, float>& coreDisMap, float* core, vector<KeyPoint> keypoints){
+map_t mapClusters(map<int, vector<KeyPoint>>& cmap, vector<int> labels, vector<KeyPoint> keypoints){
 
 	map_t amap;
 	for (size_t i = 0; i < labels.size(); i++) {
@@ -134,15 +192,6 @@ map_t mapClusters(map<int, vector<KeyPoint>>& cmap, vector<int> labels, map<int,
 		label = labels[i];
 		amap[label].push_back(i);
 		cmap[label].push_back(keypoints[i]);
-
-		//printf("core at %d is %f.\n", i, core[i]);
-		if (coreDisMap.find(label) == coreDisMap.end()) {
-			coreDisMap[label] = core[i];
-		} else {
-			if (coreDisMap[label] < core[i]) {
-				coreDisMap[label] = core[i];
-			}
-		}
 
 	}
 	printf("Found %lu clusters in mpkp.\n", amap.size());
@@ -199,7 +248,7 @@ int main(int argc, char** argv) {
 	Mat queryImage, trainImage, queryDesc, trainDesc, dataset;
 	vector<KeyPoint> queryKp, trainKp, datasetKp;
 	vector<int> labelscl, labelskp, labelskps;
-    Ptr<Feature2D> detector = SURF::create(1500);
+    Ptr<Feature2D> detector = SURF::create();
 	vector<set_t> qsetcl, qsetkp, qsetkps; // set of query cluster labels
 	vector<map_t> clustercl, clusterkp, clusterkps;
 	map<int, int> cmaps;
@@ -220,6 +269,10 @@ int main(int argc, char** argv) {
 		queryName = parser.get<String>("i1");
 		queryImage = imread(queryName);
 	    detector->detectAndCompute(queryImage, Mat(), queryKp, queryDesc);
+	    vector<KeyPoint> qp(queryKp);
+	    KeyPointsFilter::removeDuplicated(qp);
+	    printf("quer kp = %d, qp = %d\n", queryKp.size(), qp.size());
+
 	    dataset = queryDesc.clone();
 	    datasetKp = queryKp;
 	    ogsize = queryDesc.rows;
@@ -277,12 +330,13 @@ int main(int argc, char** argv) {
 	bool load = true;
 	cout << "<<<<<<< Starting the " << endl;
 	for(int i = minPts; i <= maxPts; i++){
-		map<int, float> coreDisMap, coreDisMap0, coreDisMapCl, coreDisMapSel, coreDisMapId;
+		map<int, vector<float>> disMap, disMap0, disMapCl, disMapSel, disMapId;
 		cout << "**********************************************************" << endl;
 		printf("Running hdbscan with %d minPts.\n", i);
 		//Mat x = getColourDataset(queryImage, queryKp);
 
 		/******************************************************************************************************************/
+		cout << "----------------------------------- Original descriptors" << endl;
 		hdbscan<float> scan2(_EUCLIDEAN, i);
 		scan2.run(dataset.ptr<float>(), dataset.rows, dataset.cols, true);
 		labelskp = scan2.getClusterLabels();
@@ -300,7 +354,8 @@ int main(int argc, char** argv) {
 		map_t mpkp;
 		map<int, vector<KeyPoint>> kpmapkp, kpmapkp0;
 
-		mpkp = mapClusters(kpmapkp, labelskp, coreDisMap, core, datasetKp);
+		mpkp = mapClusters(kpmapkp, labelskp, datasetKp);
+		disMap = getDistances(mpkp, scan2, core);
 		clusterkp.push_back(mpkp);
 		cmaps[i] = mpkp.size();
 
@@ -308,7 +363,7 @@ int main(int argc, char** argv) {
 
 		cout << endl;
 		printMapImages(queryImage, mpkp, kpmapkp, sokp, parser.has("o"));
-		printCoreDistances(coreDisMap, sokp);
+		printDistances(disMap, sokp);
 
 		/******************************************************************************************************************/
 
@@ -317,15 +372,17 @@ int main(int argc, char** argv) {
 		newKp.insert(newKp.end(), kpmapkp[0].begin(), kpmapkp[0].end());
 		Mat dset = getSelected(queryDesc, mpkp[0]).clone();
 		if(dset.rows > 3){
+			cout << "----------------------------------- Cluster 0 desctiprors" << endl;
 			hdbscan<float> scans(_EUCLIDEAN, 3);
 			scans.run(dset.ptr<float>(), dset.rows, dset.cols, true);
 			labelskps = scans.getClusterLabels();
 			set<int> lsetkps(labelskps.begin(), labelskps.end());
-			float* core0 = scan2.getCoreDistances();
+			float* core0 = scans.getCoreDistances();
 
-			map_t mpkp0 = mapClusters(kpmapkp0, labelskps, coreDisMap0, core0, newKp);
+			map_t mpkp0 = mapClusters(kpmapkp0, labelskps, newKp);
+			disMap0 = getDistances(mpkp0, scans, core0);
 			sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/cluster0/", i);
-			printCoreDistances(coreDisMap0, sokp);
+			printDistances(disMap0, sokp);
 			printMapImages(queryImage, mpkp0, kpmapkp0, sokp, parser.has("o"));
 		}
 
@@ -334,13 +391,16 @@ int main(int argc, char** argv) {
 
 		Mat colour = getColourDataset(queryImage, queryKp).clone();
 		map<int, vector<KeyPoint>> clkpmap;
+		cout << "----------------------------------- Colour descriptors" << endl;
 		hdbscan<float> scanc(_EUCLIDEAN, 6);
 		scanc.run(colour.ptr<float>(), colour.rows, colour.cols, true);
 		vector<int> labelsc = scanc.getClusterLabels();
 		set<int> lsetkps(labelsc.begin(), labelsc.end());
 		float* corecl = scanc.getCoreDistances();
-		map_t clmap = mapClusters(clkpmap, labelsc, coreDisMapCl, corecl, datasetKp);
+		map_t clmap = mapClusters(clkpmap, labelsc, datasetKp);
+		disMapCl = getDistances(clmap, scanc, corecl);
 		String socl = createOutpuDirs(parser, keypointsFolder, "/colour/", i);
+		printDistances(disMapCl, socl);
 		printMapImages(queryImage, clmap, clkpmap, socl, parser.has("o"));
 
 
@@ -378,24 +438,29 @@ int main(int argc, char** argv) {
 
 		load = false;
 		map<int, vector<KeyPoint>> selkpmap;
+		cout << "----------------------------------- Selected descriptors" << endl;
 		hdbscan<float> scans(_EUCLIDEAN, i);
 		scans.run(selDset.ptr<float>(), selDset.rows, selDset.cols, true);
 		vector<int> labelskpsel = scans.getClusterLabels();
 		set<int> lsetsel(labelskpsel.begin(), labelskpsel.end());
 		float* coresel = scans.getCoreDistances();
 
-		map_t selmap = mapClusters(selkpmap, labelskpsel, coreDisMapSel, coresel, selkp);
+		map_t selmap = mapClusters(selkpmap, labelskpsel, selkp);
+		disMapSel = getDistances(selmap, scans, coresel);
 		String sosel = createOutpuDirs(parser, keypointsFolder, "/selected/", i);
+		printDistances(disMapSel, sosel);
 		printMapImages(queryImage, selmap, selkpmap, sosel, parser.has("o"));
 
 		map<int, vector<KeyPoint>> selidmap;
 		float* data = getPointDataset(selkp);
+		cout << "----------------------------------- Point dataset" << endl;
 		hdbscan<float> idscan(_EUCLIDEAN, 3);
 		idscan.run(data, selkp.size(), 2, true);
 		vector<int> labeldid = idscan.getClusterLabels();
 		set<int> lsetid(labeldid.begin(), labeldid.end());
-		float* coreid = scans.getCoreDistances();
-		map_t idmap = mapClusters(selidmap, labeldid, coreDisMapId, coreid, selkp);
+		float* coreid = idscan.getCoreDistances();
+		map_t idmap = mapClusters(selidmap, labeldid, selkp);
+		//disMapId = getDistances(idmap, desc, core)
 		String soid = createOutpuDirs(parser, keypointsFolder, "/index/", i);
 		printMapImages(queryImage, idmap, selidmap, soid, parser.has("o"));
 

@@ -181,6 +181,9 @@ public:
 	bool compareClusters(Cluster* one, Cluster* two);
 
 	float* getCoreDistances();
+	DistanceCalculator<T1>& getDistanceFunction();
+
+	T1 getDistance(uint i, uint j);
 
 	void clean();
 
