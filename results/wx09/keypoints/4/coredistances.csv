@@ -1,4 +1,36 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.370122,0.788868,2.13137,0.0223599,1.32981,59.4731
-2,0.132096,0.369711,2.7988,0.0223599,1.38505,61.9436
-3,0.12999,0.363062,2.79301,0.0581396,1.24124,21.3492
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,,,,,,
+0,0.370122,0.788868,2.13137,0.0223599,1.32981,59.4731,,,Column 1,,,Column 1
+2,0.132096,0.369711,2.7988,0.0223599,1.38505,61.9436,,Mean,47.5886333333333,,Mean,41.6464
+3,0.12999,0.363062,2.79301,0.0581396,1.24124,21.3492,,Standard Error,13.1390859499857,,Standard Error,20.2972
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,59.4731,,Median,41.6464
+,,,,,,,,First Quartile ,40.41115,,First Quartile ,31.4978
+,,,,,,,,Third Quartile,60.70835,,Third Quartile,51.795
+,,,,,,,,Variance,517.906738803333,,Variance,823.95265568
+,,,,,,,,Standard Deviation,22.7575644303896,,Standard Deviation,28.7045755181992
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#NUM!
+,,,,,,,,Skewness,-1.70911587425589,,Skewness,#NUM!
+,,,,,,,,Range,40.5944,,Range,40.5944
+,,,,,,,,Minimum,21.3492,,Minimum,21.3492
+,,,,,,,,Maximum,61.9436,,Maximum,61.9436
+,,,,,,,,Sum,142.7659,,Sum,83.2928
+,,,,,,,,Count,3,,Count,2
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,Mean,2.57439333333333,,Mean,2.795905
+,,,,,,,,Standard Error,0.221517972508879,,Standard Error,0.002895
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,2.79301,,Median,2.795905
+,,,,,,,,First Quartile ,2.46219,,First Quartile ,2.7944575
+,,,,,,,,Third Quartile,2.795905,,Third Quartile,2.7973525
+,,,,,,,,Variance,0.147210636433333,,Variance,1.67620499999985E-05
+,,,,,,,,Standard Deviation,0.383680383175024,,Standard Deviation,0.00409414826307
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#NUM!
+,,,,,,,,Skewness,-1.73160707553287,,Skewness,#NUM!
+,,,,,,,,Range,0.66743,,Range,0.00579
+,,,,,,,,Minimum,2.13137,,Minimum,2.79301
+,,,,,,,,Maximum,2.7988,,Maximum,2.7988
+,,,,,,,,Sum,7.72318,,Sum,5.59181
+,,,,,,,,Count,3,,Count,2

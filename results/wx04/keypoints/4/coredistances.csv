@@ -1,4 +1,36 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.424638,0.689221,1.62308,0.0286804,1.14398,39.8871
-2,0.412382,0.436286,1.05797,0.0648171,0.251633,3.8822
-3,0.135702,0.436399,3.21585,0.0286804,1.38406,48.2581
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,,,,,,
+0,0.424638,0.689221,1.62308,0.0286804,1.14398,39.8871,,,Column 1,,,Column 1
+2,0.412382,0.436286,1.05797,0.0648171,0.251633,3.8822,,Mean,30.6758,,Mean,26.07015
+3,0.135702,0.436399,3.21585,0.0286804,1.38406,48.2581,,Standard Error,13.6129982121255,,Standard Error,22.18795
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,39.8871,,Median,26.07015
+,,,,,,,,First Quartile ,21.88465,,First Quartile ,14.976175
+,,,,,,,,Third Quartile,44.0726,,Third Quartile,37.164125
+,,,,,,,,Variance,555.94116097,,Variance,984.610250405
+,,,,,,,,Standard Deviation,23.5784045467457,,Standard Deviation,31.3784998112561
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#NUM!
+,,,,,,,,Skewness,-1.48969359912006,,Skewness,#NUM!
+,,,,,,,,Range,44.3759,,Range,44.3759
+,,,,,,,,Minimum,3.8822,,Minimum,3.8822
+,,,,,,,,Maximum,48.2581,,Maximum,48.2581
+,,,,,,,,Sum,92.0274,,Sum,52.1403
+,,,,,,,,Count,3,,Count,2
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,Mean,1.96563333333333,,Mean,2.13691
+,,,,,,,,Standard Error,0.64604401636249,,Standard Error,1.07894
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,1.62308,,Median,2.13691
+,,,,,,,,First Quartile ,1.340525,,First Quartile ,1.59744
+,,,,,,,,Third Quartile,2.419465,,Third Quartile,2.67638
+,,,,,,,,Variance,1.25211861323333,,Variance,2.3282230472
+,,,,,,,,Standard Deviation,1.11898106026569,,Standard Deviation,1.52585158098683
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#NUM!
+,,,,,,,,Skewness,1.24848284801153,,Skewness,#NUM!
+,,,,,,,,Range,2.15788,,Range,2.15788
+,,,,,,,,Minimum,1.05797,,Minimum,1.05797
+,,,,,,,,Maximum,3.21585,,Maximum,3.21585
+,,,,,,,,Sum,5.8969,,Sum,4.27382
+,,,,,,,,Count,3,,Count,2

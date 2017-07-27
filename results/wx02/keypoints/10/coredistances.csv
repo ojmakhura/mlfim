@@ -1,4 +1,36 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.324063,0.514621,1.58802,0.0283804,1.28019,45.1082
-2,0.141936,0.324011,2.28279,0.0277734,1.33583,48.0975
-3,0.283706,0.321666,1.1338,0.129859,0.918004,7.06922
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,,,,,,
+0,0.324063,0.514621,1.58802,0.0283804,1.28019,45.1082,,,Column 1,,,Column 1
+2,0.141936,0.324011,2.28279,0.0277734,1.33583,48.0975,,Mean,33.4249733333333,,Mean,27.58336
+3,0.283706,0.321666,1.1338,0.129859,0.918004,7.06922,,Standard Error,13.2061005971752,,Standard Error,20.51414
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,45.1082,,Median,27.58336
+,,,,,,,,First Quartile ,26.08871,,First Quartile ,17.32629
+,,,,,,,,Third Quartile,46.60285,,Third Quartile,37.84043
+,,,,,,,,Variance,523.203278948133,,Variance,841.6598798792
+,,,,,,,,Standard Deviation,22.8736372041731,,Standard Deviation,29.0113750084204
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#NUM!
+,,,,,,,,Skewness,-1.69883019867945,,Skewness,#NUM!
+,,,,,,,,Range,41.02828,,Range,41.02828
+,,,,,,,,Minimum,7.06922,,Minimum,7.06922
+,,,,,,,,Maximum,48.0975,,Maximum,48.0975
+,,,,,,,,Sum,100.27492,,Sum,55.16672
+,,,,,,,,Count,3,,Count,2
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,Mean,1.66820333333333,,Mean,1.708295
+,,,,,,,,Standard Error,0.334099052295041,,Standard Error,0.574495
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,1.58802,,Median,1.708295
+,,,,,,,,First Quartile ,1.36091,,First Quartile ,1.4210475
+,,,,,,,,Third Quartile,1.935405,,Third Quartile,1.9955425
+,,,,,,,,Variance,0.334866530233333,,Variance,0.66008901005
+,,,,,,,,Standard Deviation,0.578676533335622,,Standard Deviation,0.812458620515531
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#NUM!
+,,,,,,,,Skewness,0.611563136760036,,Skewness,#NUM!
+,,,,,,,,Range,1.14899,,Range,1.14899
+,,,,,,,,Minimum,1.1338,,Minimum,1.1338
+,,,,,,,,Maximum,2.28279,,Maximum,2.28279
+,,,,,,,,Sum,5.00461,,Sum,3.41659
+,,,,,,,,Count,3,,Count,2

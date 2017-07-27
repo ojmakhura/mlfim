@@ -1,6 +1,36 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.368779,0.642792,1.74303,0.11004,0.698091,6.34397
-3,0.43917,0.468801,1.06747,0.222715,0.248447,1.11554
-5,0.247431,0.324901,1.3131,0.222715,0.366212,1.64431
-6,0.130776,0.378385,2.89337,0.00770718,1.39442,180.924
-7,0.315306,0.337028,1.06889,0.222715,0.248447,1.11554
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,,,,,,
+0,0.368779,0.642792,1.74303,0.11004,0.698091,6.34397,,,Column 1,,,Column 1
+3,0.43917,0.468801,1.06747,0.222715,0.248447,1.11554,,Mean,38.228672,,Mean,46.1998475
+5,0.247431,0.324901,1.3131,0.222715,0.366212,1.64431,,Standard Error,35.6873755908881,,Standard Error,44.9082237775613
+6,0.130776,0.378385,2.89337,0.00770718,1.39442,180.924,,Mode,1.11554,,Mode,1.11554
+7,0.315306,0.337028,1.06889,0.222715,0.248447,1.11554,,Median,1.64431,,Median,1.379925
+,,,,,,,,First Quartile ,1.11554,,First Quartile ,1.11554
+,,,,,,,,Third Quartile,6.34397,,Third Quartile,46.4642325
+,,,,,,,,Variance,6367.94388282557,,Variance,8066.99425142209
+,,,,,,,,Standard Deviation,79.7993977597925,,Standard Deviation,89.8164475551226
+,,,,,,,,Kurtosis,4.98462354440645,,Kurtosis,3.99984565667459
+,,,,,,,,Skewness,2.23186599690872,,Skewness,1.99995381774152
+,,,,,,,,Range,179.80846,,Range,179.80846
+,,,,,,,,Minimum,1.11554,,Minimum,1.11554
+,,,,,,,,Maximum,180.924,,Maximum,180.924
+,,,,,,,,Sum,191.14336,,Sum,184.79939
+,,,,,,,,Count,5,,Count,4
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,Mean,1.617172,,Mean,1.5857075
+,,,,,,,,Standard Error,0.342035582423817,,Standard Error,0.439693690508423
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,1.3131,,Median,1.190995
+,,,,,,,,First Quartile ,1.06889,,First Quartile ,1.068535
+,,,,,,,,Third Quartile,1.74303,,Third Quartile,1.7081675
+,,,,,,,,Variance,0.58494169822,,Variance,0.773322165891667
+,,,,,,,,Standard Deviation,0.764814813023388,,Standard Deviation,0.879387381016846
+,,,,,,,,Kurtosis,2.38660876867509,,Kurtosis,3.62871409353549
+,,,,,,,,Skewness,1.603320121278,,Skewness,1.90044359514807
+,,,,,,,,Range,1.8259,,Range,1.8259
+,,,,,,,,Minimum,1.06747,,Minimum,1.06747
+,,,,,,,,Maximum,2.89337,,Maximum,2.89337
+,,,,,,,,Sum,8.08586,,Sum,6.34283
+,,,,,,,,Count,5,,Count,4

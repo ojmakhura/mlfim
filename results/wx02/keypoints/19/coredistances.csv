@@ -1,5 +1,36 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.299205,0.556829,1.86103,0.0277734,1.31113,47.2083
-3,0.199086,0.299746,1.50561,0.0798406,1.13797,14.253
-4,0.151562,0.299202,1.97412,0.0283804,1.29551,45.648
-5,0.191814,0.298773,1.55762,0.0798406,1.13797,14.253
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,,,,,,
+0,0.299205,0.556829,1.86103,0.0277734,1.31113,47.2083,,,Column 1,,,Column 1
+3,0.199086,0.299746,1.50561,0.0798406,1.13797,14.253,,Mean,30.340575,,Mean,24.718
+4,0.151562,0.299202,1.97412,0.0283804,1.29551,45.648,,Standard Error,9.29362481116088,,Standard Error,10.465
+5,0.191814,0.298773,1.55762,0.0798406,1.13797,14.253,,Mode,14.253,,Mode,14.253
+,,,,,,,,Median,29.9505,,Median,14.253
+,,,,,,,,First Quartile ,14.253,,First Quartile ,14.253
+,,,,,,,,Third Quartile,46.038075,,Third Quartile,29.9505
+,,,,,,,,Variance,345.4858485225,,Variance,328.548675
+,,,,,,,,Standard Deviation,18.5872496223217,,Standard Deviation,18.1259117012083
+,,,,,,,,Kurtosis,-5.96479752110148,,Kurtosis,#NUM!
+,,,,,,,,Skewness,0.006099038954934,,Skewness,1.73205080756888
+,,,,,,,,Range,32.9553,,Range,31.395
+,,,,,,,,Minimum,14.253,,Minimum,14.253
+,,,,,,,,Maximum,47.2083,,Maximum,45.648
+,,,,,,,,Sum,121.3623,,Sum,74.154
+,,,,,,,,Count,4,,Count,3
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,Mean,1.724595,,Mean,1.67911666666667
+,,,,,,,,Standard Error,0.114277555283908,,Standard Error,0.148263824575578
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,1.709325,,Median,1.55762
+,,,,,,,,First Quartile ,1.5446175,,First Quartile ,1.531615
+,,,,,,,,Third Quartile,1.8893025,,Third Quartile,1.76587
+,,,,,,,,Variance,0.052237438566667,,Variance,0.065946485033333
+,,,,,,,,Standard Deviation,0.228555110567816,,Standard Deviation,0.25680047708938
+,,,,,,,,Kurtosis,-4.5824797123156,,Kurtosis,#NUM!
+,,,,,,,,Skewness,0.162999245306745,,Skewness,1.65246582934643
+,,,,,,,,Range,0.46851,,Range,0.46851
+,,,,,,,,Minimum,1.50561,,Minimum,1.50561
+,,,,,,,,Maximum,1.97412,,Maximum,1.97412
+,,,,,,,,Sum,6.89838,,Sum,5.03735
+,,,,,,,,Count,4,,Count,3

@@ -1,4 +1,37 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.383559,0.790071,2.05984,0.0256257,1.40239,54.7261
-2,0.0591424,0.383213,6.4795,0.0256257,1.39512,54.4423
-3,0.0697993,0.38321,5.49016,0.0256257,1.39512,54.4423
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,,,,,,
+0,0.383559,0.790071,2.05984,0.0256257,1.40239,54.7261,,,Column 1,,,Column 1
+2,0.0591424,0.383213,6.4795,0.0256257,1.39512,54.4423,,Mean,54.5369,,Mean,54.4423
+3,0.0697993,0.38321,5.49016,0.0256257,1.39512,54.4423,,Standard Error,0.0946,,Standard Error,0
+,,,,,,,,Mode,54.4423,,Mode,54.4423
+,,,,,,,,Median,54.4423,,Median,54.4423
+,,,,,,,,First Quartile ,54.4423,,First Quartile ,54.4423
+,,,,,,,,Third Quartile,54.5842,,Third Quartile,54.4423
+,,,,,,,,Variance,0.02684748,,Variance,0
+,,,,,,,,Standard Deviation,0.163852006396015,,Standard Deviation,0
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#DIV/0!
+,,,,,,,,Skewness,1.73205080756888,,Skewness,Err:502
+,,,,,,,,Range,0.283799999999999,,Range,0
+,,,,,,,,Minimum,54.4423,,Minimum,54.4423
+,,,,,,,,Maximum,54.7261,,Maximum,54.4423
+,,,,,,,,Sum,163.6107,,Sum,108.8846
+,,,,,,,,Count,3,,Count,2
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,Mean,4.6765,,Mean,5.98483
+,,,,,,,,Standard Error,1.33913909852562,,Standard Error,0.49467
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,5.49016,,Median,5.98483
+,,,,,,,,First Quartile ,3.775,,First Quartile ,5.737495
+,,,,,,,,Third Quartile,5.98483,,Third Quartile,6.232165
+,,,,,,,,Variance,5.3798805756,,Variance,0.489396817799999
+,,,,,,,,Standard Deviation,2.31945695704835,,Standard Deviation,0.699569022899099
+,,,,,,,,Kurtosis,#NUM!,,Kurtosis,#NUM!
+,,,,,,,,Skewness,-1.38432974180948,,Skewness,#NUM!
+,,,,,,,,Range,4.41966,,Range,0.989339999999999
+,,,,,,,,Minimum,2.05984,,Minimum,5.49016
+,,,,,,,,Maximum,6.4795,,Maximum,6.4795
+,,,,,,,,Sum,14.0295,,Sum,11.96966
+,,,,,,,,Count,3,,Count,2

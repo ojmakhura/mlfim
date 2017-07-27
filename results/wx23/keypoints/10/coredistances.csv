@@ -1,5 +1,37 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.317995,0.665615,2.09316,0.0109981,1.28347,116.699
-2,0.266293,0.336002,1.26177,0.142243,0.709994,4.99143
-4,0.270251,0.316778,1.17216,0.142243,0.704578,4.95336
-5,0.161874,0.317992,1.96444,0.0109981,1.28347,116.699
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,,,,,,
+0,0.317995,0.665615,2.09316,0.0109981,1.28347,116.699,,,Column 1,,,Column 1
+2,0.266293,0.336002,1.26177,0.142243,0.709994,4.99143,,Mean,60.8356975,,Mean,42.2145966666667
+4,0.270251,0.316778,1.17216,0.142243,0.704578,4.95336,,Standard Error,32.2526936723747,,Standard Error,37.2422032881749
+5,0.161874,0.317992,1.96444,0.0109981,1.28347,116.699,,Mode,116.699,,Mode,#VALUE!
+,,,,,,,,Median,60.845215,,Median,4.99143
+,,,,,,,,First Quartile ,4.9819125,,First Quartile ,4.972395
+,,,,,,,,Third Quartile,116.699,,Third Quartile,60.845215
+,,,,,,,,Variance,4160.94499649616,,Variance,4160.94511727323
+,,,,,,,,Standard Deviation,64.5053873447494,,Standard Deviation,64.5053882809276
+,,,,,,,,Kurtosis,-5.99999825841865,,Kurtosis,#NUM!
+,,,,,,,,Skewness,-3.01650741348543E-07,,Skewness,1.73205012885473
+,,,,,,,,Range,111.74564,,Range,111.74564
+,,,,,,,,Minimum,4.95336,,Minimum,4.95336
+,,,,,,,,Maximum,116.699,,Maximum,116.699
+,,,,,,,,Sum,243.34279,,Sum,126.64379
+,,,,,,,,Count,4,,Count,3
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,,,,
+,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,Mean,1.6228825,,Mean,1.46612333333333
+,,,,,,,,Standard Error,0.236533201065411,,Standard Error,0.250497580316546
+,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,Median,1.613105,,Median,1.26177
+,,,,,,,,First Quartile ,1.2393675,,First Quartile ,1.216965
+,,,,,,,,Third Quartile,1.99662,,Third Quartile,1.613105
+,,,,,,,,Variance,0.223791820825,,Variance,0.188247113233333
+,,,,,,,,Standard Deviation,0.473066402130821,,Standard Deviation,0.433874536281323
+,,,,,,,,Kurtosis,-5.46017411987869,,Kurtosis,#NUM!
+,,,,,,,,Skewness,0.032739548891224,,Skewness,1.64930254266464
+,,,,,,,,Range,0.921,,Range,0.79228
+,,,,,,,,Minimum,1.17216,,Minimum,1.17216
+,,,,,,,,Maximum,2.09316,,Maximum,1.96444
+,,,,,,,,Sum,6.49153,,Sum,4.39837
+,,,,,,,,Count,4,,Count,3
