@@ -19,6 +19,7 @@
 #include <opencv2/xfeatures2d.hpp>
 #include <ctime>
 #include <string>
+#include <gsl/gsl_statistics.h>
 #include "process_frame.hpp"
 
 using namespace std;
@@ -55,6 +56,66 @@ Mat getColourDataset(Mat f, vector<KeyPoint> pts){
 	}
 	cout << "getting stdata done" << endl;
 	return m;
+}
+
+void printStatistics(map<int, map<String, double>> stats, String folder){
+	printf("Printing statistics to %s.\n", folder.c_str());
+	ofstream coreFile, disFile;
+	String name = "/core_distance_statistics.csv";
+	String f = folder;
+	f += name;
+	coreFile.open(f.c_str());
+
+	f = folder;
+	name = "/distance_statistics.csv";
+	f += name;
+	disFile.open(f.c_str());
+
+	coreFile << "minPts, Mean, Variance, Standard Deviation, Kurtosis, Skewness, Count\n";
+	disFile << "minPts, Mean, Variance, Standard Deviation, Kurtosis, Skewness, Count\n";
+
+	for(map<int, map<String, double>>::iterator it = stats.begin(); it != stats.end(); ++it){
+
+		map<String, double> mp = it->second;
+		coreFile << it->first << ",";
+		coreFile << mp["mean_cr"] << ",";
+		coreFile << mp["variance_cr"] << ",";
+		coreFile << mp["sd_cr"] << ",";
+		if(mp["kurtosis_cr"] == std::numeric_limits<double>::max()){
+			coreFile << "NaN" << ",";
+		} else {
+			coreFile << mp["kurtosis_cr"] << ",";
+		}
+
+		if(mp["skew_cr"] == std::numeric_limits<double>::max()){
+			coreFile << "NaN" << ",";
+		} else {
+			coreFile << mp["skew_cr"] << ",";
+		}
+		coreFile << mp["count"] << "\n";
+
+		disFile << it->first << ",";
+		disFile << mp["mean_dr"] << ",";
+		disFile << mp["variance_dr"] << ",";
+		disFile << mp["sd_dr"] << ",";
+		if(mp["kurtosis_dr"] == std::numeric_limits<double>::max()){
+			disFile << "NaN" << ",";
+		} else {
+			disFile << mp["kurtosis_dr"] << ",";
+		}
+
+		if(mp["skew_dr"] == std::numeric_limits<double>::max()){
+			disFile << "NaN" << ",";
+		} else {
+			disFile << mp["skew_dr"] << ",";
+		}
+		disFile << mp["count"] << "\n";
+
+	}
+
+	coreFile.close();
+	disFile.close();
+
 }
 
 Mat getSelected(Mat desc, vector<int> indices){
@@ -102,27 +163,71 @@ void printClusterNumbers(map<int, int> maps, String folder){
 	myfile.close();
 }
 
-void printDistances(map<int, vector<float>> distances, String folder){
+map<String, double> printDistances(map<int, vector<float>> distances, String folder){
 	printf("Printing core distances to %s.\n", folder.c_str());
 	ofstream myfile;
 	String name = "/coredistances.csv";
 	String f = folder;
 	f += name;
 	myfile.open(f.c_str());
+	map<String, double> stats;
+	double cr[distances.size()];
+	double dr[distances.size()];
 
 	myfile << "Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio\n";
-
+	int c = 0;
 	for(map<int, vector<float> >::iterator it = distances.begin(); it != distances.end(); ++it){
 		// print min core, max core and core ratio
-		myfile << it->first << "," << it->second[0] << "," << it->second[1] << "," << it->second[1]/it->second[0] << ",";
+		cr[c] = (double)it->second[1]/it->second[0];
+		myfile << it->first << "," << it->second[0] << "," << it->second[1] << "," << cr[c] << ",";
 
 		// print min distance, max distance and distance ratio
-		myfile << it->second[2] << "," << it->second[3] << "," << it->second[3]/it->second[2];
+		dr[c] = (double)it->second[3]/it->second[2];
+		myfile << it->second[2] << "," << it->second[3] << "," << dr[c];
 
 		myfile << "\n";
+		c++;
 	}
 
 	myfile.close();
+
+	// Calculating core distance statistics
+	stats["mean_cr"] = gsl_stats_mean(cr, 1, c);
+	stats["sd_cr"] = gsl_stats_sd(cr, 1, c);
+	stats["variance_cr"] = gsl_stats_variance(cr, 1, c);
+	if(c > 3){
+		stats["kurtosis_cr"] = gsl_stats_kurtosis(cr, 1, c);
+	} else{
+		stats["kurtosis_cr"] = std::numeric_limits<double>::max();
+	}
+
+	if(c > 2){
+		stats["skew_cr"] = gsl_stats_skew(cr, 1, c);
+	} else{
+		stats["skew_cr"] = std::numeric_limits<double>::max();
+	}
+
+	// Calculating distance statistics
+	stats["mean_dr"] = gsl_stats_mean(dr, 1, c);
+	stats["sd_dr"] = gsl_stats_sd(dr, 1, c);
+	stats["variance_dr"] = gsl_stats_variance(dr, 1, c);
+	if(c > 3){
+		stats["kurtosis_dr"] = gsl_stats_kurtosis(dr, 1, c);
+	} else{
+		stats["kurtosis_dr"] = std::numeric_limits<double>::max();
+	}
+
+	if(c > 2){
+		stats["skew_dr"] = gsl_stats_skew(dr, 1, c);
+	} else{
+		stats["skew_dr"] = std::numeric_limits<double>::max();
+	}
+
+	stats["count"] = c;
+	//free(cr);
+	//free(dr);
+
+	return stats;
 }
 
 map<int, vector<float>> getDistances(map_t mp, hdbscan<float>& sc, float* core){
@@ -300,7 +405,7 @@ int main(int argc, char** argv) {
 			    datasetKp.insert(datasetKp.end(), trainKp.begin(), trainKp.end());
 			}
 		} else if(mode != 1){
-			printf("Mode has to be either 1 or 2");
+			printf("Mode has to be either 1 or 2\n");
 			help();
 			return -1;
 		}
@@ -327,6 +432,7 @@ int main(int argc, char** argv) {
 
 	Mat selDset;
 	vector<KeyPoint> selkp;
+	map<int, map<String, double>> stats_kp, stats_kp0, stats_cl, stats_idx, stats_sel;
 	bool load = true;
 	cout << "<<<<<<< Starting the " << endl;
 	for(int i = minPts; i <= maxPts; i++){
@@ -363,7 +469,7 @@ int main(int argc, char** argv) {
 
 		cout << endl;
 		printMapImages(queryImage, mpkp, kpmapkp, sokp, parser.has("o"));
-		printDistances(disMap, sokp);
+		stats_kp[i] = printDistances(disMap, sokp);
 
 		/******************************************************************************************************************/
 
@@ -382,7 +488,7 @@ int main(int argc, char** argv) {
 			map_t mpkp0 = mapClusters(kpmapkp0, labelskps, newKp);
 			disMap0 = getDistances(mpkp0, scans, core0);
 			sokp = createOutpuDirs(parser, keypointsFolder, "/keypoints/cluster0/", i);
-			printDistances(disMap0, sokp);
+			stats_kp0[i] = printDistances(disMap0, sokp);
 			printMapImages(queryImage, mpkp0, kpmapkp0, sokp, parser.has("o"));
 		}
 
@@ -400,7 +506,7 @@ int main(int argc, char** argv) {
 		map_t clmap = mapClusters(clkpmap, labelsc, datasetKp);
 		disMapCl = getDistances(clmap, scanc, corecl);
 		String socl = createOutpuDirs(parser, keypointsFolder, "/colour/", i);
-		printDistances(disMapCl, socl);
+		stats_cl[i] = printDistances(disMapCl, socl);
 		printMapImages(queryImage, clmap, clkpmap, socl, parser.has("o"));
 
 
@@ -448,7 +554,7 @@ int main(int argc, char** argv) {
 		map_t selmap = mapClusters(selkpmap, labelskpsel, selkp);
 		disMapSel = getDistances(selmap, scans, coresel);
 		String sosel = createOutpuDirs(parser, keypointsFolder, "/selected/", i);
-		printDistances(disMapSel, sosel);
+		stats_sel[i] = printDistances(disMapSel, sosel);
 		printMapImages(queryImage, selmap, selkpmap, sosel, parser.has("o"));
 
 		map<int, vector<KeyPoint>> selidmap;
@@ -467,6 +573,25 @@ int main(int argc, char** argv) {
 	}
 
 	printClusterNumbers(cmaps, keypointsFolder);
+
+	if(parser.has("o")){
+		String mfolder = parser.get<String>("o");
+		String ofolder = mfolder;
+		ofolder += "/keypoints/";
+		printStatistics(stats_kp, ofolder);
+
+		ofolder = mfolder;
+		ofolder += "/keypoints/cluster0/";
+		printStatistics(stats_kp0, ofolder);
+
+		ofolder = mfolder;
+		ofolder += "/selected/";
+		printStatistics(stats_sel, ofolder);
+
+		ofolder = mfolder;
+		ofolder += "/colour/";
+		printStatistics(stats_cl, ofolder);
+	}
 
 
 	return 0;
