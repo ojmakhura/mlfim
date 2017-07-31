@@ -1,6 +1,37 @@
-Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio
-0,0.273515,0.477771,1.74678,0.0283804,1.28019,45.1082
-3,0.247692,0.302087,1.2196,0.116808,0.990586,8.4805
-5,0.280241,0.30015,1.07104,0.380356,0.586861,1.54293
-6,0.125469,0.300636,2.3961,0.0277734,1.33583,48.0975
-7,0.228145,0.297222,1.30277,0.380356,0.586861,1.54293
+Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio,Core Ratio Confidence,Distance Ratio Confidence,,,,,,
+0,0.273515,0.477771,1.74678,0.0283804,1.28019,45.1082,27.10%,6.22%,,,Column 1,,,Column 1
+3,0.247692,0.302087,1.2196,0.116808,0.990586,8.4805,49.10%,82.37%,,Mean,20.954412,,Mean,14.915965
+5,0.280241,0.30015,1.07104,0.380356,0.586861,1.54293,55.30%,96.79%,,Standard Error,10.5578464858632,,Standard Error,11.1807334469647
+6,0.125469,0.300636,2.3961,0.0277734,1.33583,48.0975,0.00%,0.00%,,Mode,1.54293,,Mode,1.54293
+7,0.228145,0.297222,1.30277,0.380356,0.586861,1.54293,45.63%,96.79%,,Median,8.4805,,Median,5.011715
+,,,,,,,,,,First Quartile ,1.54293,,First Quartile ,1.54293
+,,,,,,,,,,Third Quartile,45.1082,,Third Quartile,18.38475
+,,,,,,,,,,Variance,557.34061209527,,Variance,500.0352016483
+,,,,,,,,,,Standard Deviation,23.6080624383974,,Standard Deviation,22.3614668939294
+,,,,,,,,,,Kurtosis,-3.20595317574424,,Kurtosis,3.53645091497691
+,,,,,,,,,,Skewness,0.554788295238049,,Skewness,1.87712106622886
+,,,,,,,,,,Range,46.55457,,Range,46.55457
+,,,,,,,,,,Minimum,1.54293,,Minimum,1.54293
+,,,,,,,,,,Maximum,48.0975,,Maximum,48.0975
+,,,,,,,,,,Sum,104.77206,,Sum,59.66386
+,,,,,,,,,,Count,5,,Count,4
+,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,
+,,,,,,,,,,,Column 1,,,Column 1
+,,,,,,,,,,Mean,1.547258,,Mean,1.4973775
+,,,,,,,,,,Standard Error,0.240235249295352,,Standard Error,0.303383450229106
+,,,,,,,,,,Mode,#VALUE!,,Mode,#VALUE!
+,,,,,,,,,,Median,1.30277,,Median,1.261185
+,,,,,,,,,,First Quartile ,1.2196,,First Quartile ,1.18246
+,,,,,,,,,,Third Quartile,1.74678,,Third Quartile,1.5761025
+,,,,,,,,,,Variance,0.28856487502,,Variance,0.368166071491667
+,,,,,,,,,,Standard Deviation,0.537182348016016,,Standard Deviation,0.606766900458213
+,,,,,,,,,,Kurtosis,0.815964423637698,,Kurtosis,3.53745017540512
+,,,,,,,,,,Skewness,1.24122521708017,,Skewness,1.84908629599633
+,,,,,,,,,,Range,1.32506,,Range,1.32506
+,,,,,,,,,,Minimum,1.07104,,Minimum,1.07104
+,,,,,,,,,,Maximum,2.3961,,Maximum,2.3961
+,,,,,,,,,,Sum,7.73629,,Sum,5.98951
+,,,,,,,,,,Count,5,,Count,4

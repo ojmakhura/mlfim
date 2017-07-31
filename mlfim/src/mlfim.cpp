@@ -174,27 +174,25 @@ map<String, double> printDistances(map<int, vector<float>> distances, String fol
 	double cr[distances.size()];
 	double dr[distances.size()];
 
-	myfile << "Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Min Distance, Max Distance, Distance Ratio\n";
 	int c = 0;
 	for(map<int, vector<float> >::iterator it = distances.begin(); it != distances.end(); ++it){
 		// print min core, max core and core ratio
 		cr[c] = (double)it->second[1]/it->second[0];
-		myfile << it->first << "," << it->second[0] << "," << it->second[1] << "," << cr[c] << ",";
+		//myfile << it->first << "," << it->second[0] << "," << it->second[1] << "," << cr[c] << ",";
 
 		// print min distance, max distance and distance ratio
 		dr[c] = (double)it->second[3]/it->second[2];
-		myfile << it->second[2] << "," << it->second[3] << "," << dr[c];
+		//myfile << it->second[2] << "," << it->second[3] << "," << dr[c];
 
-		myfile << "\n";
+		//myfile << "\n";
 		c++;
 	}
-
-	myfile.close();
 
 	// Calculating core distance statistics
 	stats["mean_cr"] = gsl_stats_mean(cr, 1, c);
 	stats["sd_cr"] = gsl_stats_sd(cr, 1, c);
 	stats["variance_cr"] = gsl_stats_variance(cr, 1, c);
+	stats["max_cr"] = gsl_stats_max(cr, 1, c);
 	if(c > 3){
 		stats["kurtosis_cr"] = gsl_stats_kurtosis(cr, 1, c);
 	} else{
@@ -211,6 +209,7 @@ map<String, double> printDistances(map<int, vector<float>> distances, String fol
 	stats["mean_dr"] = gsl_stats_mean(dr, 1, c);
 	stats["sd_dr"] = gsl_stats_sd(dr, 1, c);
 	stats["variance_dr"] = gsl_stats_variance(dr, 1, c);
+	stats["max_dr"] = gsl_stats_max(dr, 1, c);
 	if(c > 3){
 		stats["kurtosis_dr"] = gsl_stats_kurtosis(dr, 1, c);
 	} else{
@@ -224,8 +223,23 @@ map<String, double> printDistances(map<int, vector<float>> distances, String fol
 	}
 
 	stats["count"] = c;
-	//free(cr);
-	//free(dr);
+	myfile << "Cluster, Min Core Distance, Max Core Distance, Core Distance Ratio, Core Distance Ratio Confidence, Min Distance, Max Distance, Distance Ratio, Distance Ratio Confidence\n";
+	c = 0;
+	for (map<int, vector<float> >::iterator it = distances.begin();	it != distances.end(); ++it) {
+		// print min core, max core and core ratio
+		double cn = ((stats["max_cr"] - cr[c])/stats["max_cr"])*100;
+		myfile << it->first << "," << it->second[0] << "," << it->second[1]
+				<< "," << cr[c] << "," << cn << ",";
+
+		// print min distance, max distance and distance ratio
+		cn = ((stats["max_dr"] - dr[c])/stats["max_dr"])*100;
+		myfile << it->second[2] << "," << it->second[3] << "," << dr[c] << "," << cn;
+
+		myfile << "\n";
+		c++;
+	}
+
+	myfile.close();
 
 	return stats;
 }
@@ -353,7 +367,7 @@ int main(int argc, char** argv) {
 	Mat queryImage, trainImage, queryDesc, trainDesc, dataset;
 	vector<KeyPoint> queryKp, trainKp, datasetKp;
 	vector<int> labelscl, labelskp, labelskps;
-    Ptr<Feature2D> detector = SURF::create();
+    Ptr<Feature2D> detector = SURF::create(1000);
 	vector<set_t> qsetcl, qsetkp, qsetkps; // set of query cluster labels
 	vector<map_t> clustercl, clusterkp, clusterkps;
 	map<int, int> cmaps;
